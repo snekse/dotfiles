@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mas search:*)",
+      "Bash(brew search:*)"
+    ]
+  }
+}

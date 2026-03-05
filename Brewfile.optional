@@ -1,0 +1,16 @@
+# GUI Applications
+cask "google-chrome"
+cask "iterm2"
+cask "visual-studio-code"
+cask "obsidian"
+# cask "rectangle"    # window management (free alternative to Magnet)
+
+# Fonts
+cask "font-hack-nerd-font"
+cask "font-fira-code-nerd-font"
+
+# Mac App Store (requires: mas installed and App Store sign-in)
+brew "mas"
+mas "Xcode", id: 497799835
+mas "Slack for Desktop", id: 803453959
+mas "Magnet", id: 441258766
