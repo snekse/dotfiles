@@ -1,0 +1,37 @@
+# Starship prompt configuration
+# Docs: https://starship.rs/config/
+#
+# Format: defines the order and content of the prompt line.
+# Each module is only shown when relevant (e.g. $nodejs only appears in Node projects).
+
+format = """
+$directory\
+$git_branch\
+$git_status\
+$nodejs\
+$python\
+$ruby\
+$java\
+$line_break\
+$character"""
+
+[directory]
+# How many path components to show before truncating
+truncation_length = 3
+# Truncate relative to the repo root when inside a git repo
+truncate_to_repo = true
+
+[git_branch]
+format = "[$symbol$branch]($style) "
+
+[git_status]
+# Shows symbols for staged, modified, untracked, ahead/behind, etc.
+format = '([$all_status$ahead_behind]($style) )'
+
+[nodejs]
+format = "[$symbol($version)]($style) "
+
+[character]
+# The prompt character — green > on success, red > on non-zero exit code
+success_symbol = "[>](bold green)"
+error_symbol = "[>](bold red)"

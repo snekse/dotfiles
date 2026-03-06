@@ -39,5 +39,14 @@ brew "gemini-cli"       # Google's Gemini CLI
 cask "codex"            # OpenAI's Codex CLI
 
 # Java
-tap "pivotal/tap"
-brew "springboot"       # Spring Boot CLI
+# springboot is managed via SDKMAN (see sdkman.zsh) — pivotal/tap formula is broken
+brew "maven"            # Java build tool
+
+# Document processing
+brew "pandoc"           # universal document converter (markdown → PDF, DOCX, etc.)
+
+# Shell tooling
+brew "shellcheck"       # static analysis / linter for shell scripts
+
+# Docker
+brew "lazydocker"       # terminal UI for Docker and Docker Compose

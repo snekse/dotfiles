@@ -8,6 +8,7 @@ cask "obsidian"
 # Fonts
 cask "font-hack-nerd-font"
 cask "font-fira-code-nerd-font"
+cask "font-iosevka-slab"
 
 # Mac App Store (requires: mas installed and App Store sign-in)
 brew "mas"
