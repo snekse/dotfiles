@@ -50,3 +50,6 @@ brew "shellcheck"       # static analysis / linter for shell scripts
 
 # Docker
 brew "lazydocker"       # terminal UI for Docker and Docker Compose
+
+# Git
+brew "git-lfs"          # Git Large File Storage — handles binary assets in repos

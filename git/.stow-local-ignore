@@ -1,0 +1,77 @@
+# Override stow's default ignore list for this package.
+# By default, stow ignores .gitignore files — but we need ~/.gitignore symlinked.
+# Listing any ignore file here replaces the entire default list, so we re-add
+# the other defaults we still want ignored.
+#
+# Pattern syntax is Perl regex, matched against the filename (not full path).
+# Use ^/pattern to anchor to the package root only.
+
+# Stow metadata (never stow this)
+^\.stow-local-ignore$
+
+# Version control internals
+^\.git$
+^\.gitmodules$
+\.hg
+_darcs
+\.svn
+\.pcl-cvs-cache
+BitKeeper
+\{arch\}
+\.arch-ids
+\.arch-inventory
+RCS
+CVS
+\.cvsignore
+Attic
+.*,v
+
+# Backup and temporary files
+.*~
+.*\.orig
+.*\.old
+.*\.rej
+.*\.bak
+
+# Compiled artifacts
+.*\.o
+.*\.pyc
+.*\.class
+.*\.zwc
+
+# Build directories
+_build
+Build
+
+# Tags (ctags/etags)
+tags
+TAGS
+
+# Shell history (never symlink history files)
+\.zshhistory
+\.bash_history
+
+# Python
+\.mypy_cache
+
+# Env files (never symlink these)
+\.env
+\.env\..*
+
+# Documentation files that belong in repos, not in ~
+README.*
+LICENSE.*
+COPYING
+
+# Editor and IDE config (root-level only — anchored with ^/)
+^/.editorconfig
+^/.prettier.*
+^/.cursor
+
+# AI tool instruction files (root-level only)
+^/AGENTS.md
+^/CLAUDE.md
+^/GEMINI.md
+
+# JS tooling
+^/node_modules

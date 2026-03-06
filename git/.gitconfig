@@ -1,0 +1,188 @@
+[core]
+  excludesfile = ~/.gitignore
+  whitespace = fix
+  autocrlf = input
+
+[color]
+  ui = auto
+  branch = auto
+  diff = auto
+  status = auto
+
+[branch]
+  autosetupmerge = always
+  autosetuprebase = local
+
+[push]
+  default = current
+
+[pull]
+  rebase = true
+
+[rebase]
+  autoStash = true
+
+[rerere]
+  enabled = true
+
+[init]
+  defaultBranch = main
+
+[credential]
+  helper = osxkeychain
+
+# Enforce SSH for all GitHub remotes (avoids HTTPS auth prompts)
+[url "git@github.com:"]
+  insteadOf = https://github.com/
+
+# git-lfs — managed by Homebrew (see Brewfile)
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
+
+# STALE: [filter "hawser"] removed — hawser is the dead predecessor to git-lfs
+# STALE: [difftool "sourcetree"] removed — SourceTree not in Brewfile
+# STALE: [mergetool "sourcetree"] removed — SourceTree not in Brewfile
+# STALE: [hub] removed — hub CLI replaced by gh (see Brewfile)
+# STALE: [commit] template removed — was pointing to a SourceTree commit template at an absolute path
+
+[user]
+  # Forces git to error if name/email are not explicitly set for a repo.
+  # Identity is provided via includeIf (below) or ~/.gitconfig.local (fallback).
+  useConfigOnly = true
+
+[alias]
+  ########################################
+  # Config commands
+  ########################################
+  editConfig = "!code ~/.gitconfig"
+  # setAuthor "Derek Eskens" "snekse@gmail.com"
+  setAuthor = "!f(){ git config user.name $1 && git config user.email $2; }; f"
+  # setEmail "snekse@gmail.com"
+  setEmail = "!f(){ git config user.email $1; }; f"
+
+  ########################################
+  # Commit commands
+  ########################################
+  amend = commit -a --amend
+
+  ########################################
+  # Branching and Checkout commands
+  ########################################
+  branches = branch -ra
+  co  = checkout
+  cob = checkout -b
+  cop = "!f() { git fetch && git co $1 && git pull; }; f"
+  makeb = "!f() { git cob $1 && git branch --force $2 origin/$2; }; f"
+  findb = "!f(){ git branches | grep $1; }; f"
+  st = status -sb
+  echoStatus = "!f(){ pwd && git status -sb && echo; }; f"
+  recent = for-each-ref --count=10 --sort=-committerdate refs/heads/ --format="%(refname:short)"
+
+  ########################################
+  # Pull & Fetch commands
+  ########################################
+  pr = pull --rebase
+  fetchup = fetch upstream
+
+  ########################################
+  # Rebase commands
+  ########################################
+  # Push after pulling remote rebase
+  pullrp = !git pr && git push
+  prp = !git pullrp
+  pullrsup = !git pr && git submodule update --recursive && git push
+
+  # Rebase with a different branch — could be remote or local
+  # USAGE: rebaseWith develop  -OR-  rebaseWith origin/release/4.1.2
+  rebaseWith = "!f(){ git cop $1 && git rbPrevWith $1; }; f"
+  rbPrevWith = "!f(){ git co - && git rebase $1; }; f"
+
+  # Rebase with upstream — requires a remote named upstream
+  # e.g. git remote add upstream git@github.com:snekse/dotfiles.git
+  reUp = "!f(){ git cop $1 && git fetchup && git rebase upstream/$2; }; f"
+  rebaseWithUpstream = "!f(){ git cop $1 && git fetchup && git rebase upstream/$1 && git rbPrevWith $1; }; f"
+
+  ########################################
+  # Push commands
+  ########################################
+  # Force-create a new remote tracking branch
+  pushUpNew = push -u origin HEAD
+
+  ########################################
+  # Diff
+  ########################################
+  diffw = diff -w
+  worddiff = diff --word-diff
+
+  ########################################
+  # Logging commands
+  ########################################
+  overview = log --all --since='10 days' --oneline --no-merges
+  recap = !git log --all --oneline --no-merges --author=${1-$(git config user.email)}
+  today = !git log --all --since=00:00:00 --oneline --no-merges --author=${1-$(git config user.email)}
+  whatDidIDo = "!f(){ git log --all --no-merges --author=$(git config user.email); }; f"
+  changelog = "!f(){ git log --oneline --no-merges $1..$2; }; f"
+
+  lc  = log --pretty=format:"%C(yellow)%h" --decorate
+  ls  = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate
+  ll  = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+  lds = log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short
+
+  lg  = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
+  lg1 = log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
+  graph = log --graph --all --decorate --stat --date=iso
+
+  ########################################
+  # WIP / Stash commands
+  ########################################
+  sl = stash list
+  sa = stash apply
+  ss = stash save
+  undo = reset HEAD~1 --mixed
+  up = !git pullrp $@ && git submodule update --init --recursive
+  wip = commit -am "WIP"
+  # Save a trash savepoint and immediately roll back — lets you restart cleanly while keeping an escape hatch
+  trash = !git add -A && git commit -qm 'TRASH RESTART SAVEPOINT' && git reset HEAD~1 --hard
+  trashrestore = "!f(){ git add -A && git commit -qm 'RESTORE SAVEPOINT'; git reset $1 --hard; }; f"
+
+  ########################################
+  # History commands
+  ########################################
+  deletedWhen = rev-list -n 1 HEAD --
+  find = log --oneline --name-status -i --grep
+  lastMatching  = "!f(){ git log --pretty=format:'%C(yellow)%h%Cred%d %Creset%s%Cblue [%cn]' --decorate -1 --grep=$1; }; f"
+  lastMatchingCommit = "!f(){ git log --pretty=format:'%C(yellow)%h' --decorate -1 --grep=$1; }; f"
+
+  ########################################
+  # Stats / misc
+  ########################################
+  stats    = shortlog -sn --since='10 days'
+  stats-y  = shortlog -sn --since='yesterday'
+  stats30  = shortlog -sn --since='30 days'
+  statsNCS = shortlog -sn --since='Jan 8, 2018'
+  statsD3  = shortlog -sn --since='Apr 1, 2019'
+  zip      = "!f(){ git archive --format=zip HEAD > $1.zip; }; f"
+
+  ########################################
+  # Client-centric helpers
+  ########################################
+  dev    = !git co develop
+  devUp  = !git cop develop
+
+# Multi-identity: loads a different [user] block based on which directory the repo lives in.
+# The path must end with a trailing slash.
+# All personal repos live under ~/dev/github/snekse/
+[includeIf "gitdir:~/dev/github/snekse/"]
+  path = ~/.gitconfig-personal
+
+# Uncomment and set when working with a work/freelance org directory:
+# [includeIf "gitdir:~/dev/github/<org-name>/"]
+#   path = ~/.gitconfig-work
+
+# Machine-specific fallback: name, email, etc. for repos outside the above directories.
+# This file is NOT in the repo — created by running: just setup-git
+[include]
+  path = ~/.gitconfig.local

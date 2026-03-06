@@ -1,0 +1,8 @@
+# Template — copy to ~/.gitconfig-personal and fill in your real details.
+# This file IS committed to the repo as a reference.
+# The active file lives at ~/.gitconfig-personal (not in the repo).
+#
+# Loaded automatically for repos under ~/dev/github/snekse/ via includeIf in .gitconfig.
+[user]
+  name = Your Name
+  email = you@personal.com

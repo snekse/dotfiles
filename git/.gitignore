@@ -1,0 +1,97 @@
+# local
+**/.claude/settings.local.json
+**/**.local.**
+**/**.local
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+.AppleDB
+.AppleDesktop
+
+# Editor
+.vscode/
+*.swp
+*.swo
+*~
+.idea/
+*.iml
+out/
+.idea_modules/
+atlassian-ide-plugin.xml
+
+# Sublime Text
+*.sublime-workspace
+sftp-config.json
+
+# TextMate
+*.tmproj
+*.tmproject
+tmtags
+
+# Vim
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.python-version
+
+# Ruby
+.bundle/
+
+# Java / Gradle / Maven
+*.class
+*.jar
+target/
+.gradle/
+local.properties
+bin/
+out/
+
+# Archives (prefer committing raw source — git has its own compression)
+*.7z
+*.rar
+*.zip
+*.gz
+*.bzip
+*.bz2
+*.xz
+*.lzma
+*.cab
+*.iso
+*.tar
+*.dmg
+*.gem
+*.egg
+*.deb
+*.rpm
+
+# Misc
+tmp/
+*.tmp
+*.bak
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.svn/

@@ -22,6 +22,9 @@ just unlink          # Unstow all packages
 just install-apps    # Install optional GUI apps (casks, App Store)
 just update          # Upgrade brew packages
 just brew-check      # Check what brew bundle would change
+just setup           # Interactive new-machine setup (zsh + git local configs)
+just setup-zsh       # Write ~/.zshrc.local with DEV path and optional CONFLUENT_HOME
+just setup-git       # Write ~/.gitconfig.local with name and email
 ```
 
 ## Stow: How Symlinks Work
@@ -46,6 +49,8 @@ README\.md
 
 **Global:** Add `--ignore=pattern` to `.stowrc` to exclude across all packages. For example, `.gitkeep` files are excluded globally since they only exist to keep empty directories tracked in git.
 
+**Gotcha — stow ignores `.gitignore` by default:** Stow's built-in default ignore list includes `.gitignore`, so a `git/.gitignore` package file will silently not be symlinked unless you override this. The fix is a `.stow-local-ignore` in the package directory — but note that creating one **replaces** the entire default list, so you must re-add any other defaults you still want (`.git`, `.gitmodules`, etc.). See [stow ignore list docs](https://www.gnu.org/software/stow/manual/html_node/Types-And-Syntax-Of-Ignore-Lists.html) and [issue #75](https://github.com/aspiers/stow/issues/75) for details. The `git/` package in this repo includes a `.stow-local-ignore` that handles this.
+
 ## Manual Steps
 
 These cannot be automated and must be done by hand:
@@ -56,16 +61,18 @@ SSH config is not stored in this repo. Set up `~/.ssh/config` manually with your
 
 ### Git Identity
 
-Create `~/.gitconfig.local` with your machine-specific identity:
+Run `just setup-git` to create `~/.gitconfig.local` with your machine-specific default identity (name and email). This file is never committed to the repo.
+
+For multi-identity setups, the main `.gitconfig` uses `includeIf` to automatically load a different identity based on which directory a repo lives in:
 
 ```gitconfig
-[user]
-    name = Your Name
-    email = you@example.com
-    signingkey = YOUR_KEY
+[includeIf "gitdir:~/dev/github/snekse/"]
+  path = ~/.gitconfig-personal
 ```
 
-The main gitconfig uses `includeIf` to switch identities by project directory.
+This means any repo under `~/dev/github/snekse/` automatically gets the personal identity — no per-repo configuration needed. To add a work identity, copy `git/.gitconfig-work` to `~/.gitconfig-work`, fill in your details, and uncomment the matching `includeIf` block in `.gitconfig`.
+
+`useConfigOnly = true` is set globally, which means git will error rather than silently use a wrong identity if no matching config is found for a repo. Always ensure repos live under a configured `includeIf` path or that `~/.gitconfig.local` exists as a fallback.
 
 ### App Store
 
