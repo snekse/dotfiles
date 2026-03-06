@@ -3,7 +3,7 @@ default:
     @just --list
 
 # Full install: link dotfiles and install packages
-install: brew-install link
+install: brew-install link install-runtimes
 
 # Stow all packages
 link:
@@ -21,10 +21,26 @@ brew-install:
 install-apps:
     brew bundle --file=Brewfile.optional
 
+# Install all language runtimes
+install-runtimes: install-sdkman install-nvm install-rbenv
+
+install-sdkman:
+    bash install/sdkman.sh
+
+install-nvm:
+    bash install/nvm.sh
+
+install-rbenv:
+    bash install/rbenv.sh
+
 # Upgrade everything
 update:
     brew update && brew upgrade
     brew bundle --cleanup --file=Brewfile
+    -sdk selfupdate
+    -sdk update
+    -nvm install --lts --reinstall-packages-from=current
+    -rbenv update || true
 
 # Check what brew bundle would change
 brew-check:

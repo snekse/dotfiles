@@ -23,6 +23,9 @@ brew "tree"             # prints directory structure as a tree
 # Python — uv handles version management, virtual environments, and deps in one tool
 brew "uv"
 
+# Node — pnpm is the primary package manager (faster installs, shared content-addressable store)
+brew "pnpm"
+
 # Ruby — version manager similar to SDKMAN for Java
 brew "rbenv"
 brew "ruby-build"       # rbenv plugin to install Ruby versions
