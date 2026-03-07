@@ -5,7 +5,8 @@
 # Add a package to the dotfiles Brewfile, install it, and sync the repo.
 #
 # Usage:
-#   brew-add <package>              # auto-detect formula vs cask
+#   brew-add <package>              # auto-detect formula vs cask → Brewfile
+#   brew-add -o <package>           # add to Brewfile.optional instead
 #   brew-add --formula <package>    # force formula
 #   brew-add --cask <package>       # force cask
 #   brew-add --tap <package>        # add a tap
@@ -17,29 +18,32 @@ brew-add() {
   local pkg_type=""
   local user_specified_type=false
   local pkg_name=""
+  local optional=false
 
   # Parse arguments
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --help|-h)
-        echo "Usage: brew-add [--cask|--tap|--formula] <package>"
+        echo "Usage: brew-add [-o] [--cask|--tap|--formula] <package>"
         echo ""
         echo "Add a package to the dotfiles Brewfile, install it, and sync the repo."
         echo ""
         echo "Options:"
+        echo "  -o          Add to Brewfile.optional instead of Brewfile"
         echo "  --formula   Force add as a Homebrew formula (default when auto-detected)"
         echo "  --cask      Force add as a Homebrew cask (GUI apps)"
         echo "  --tap       Add a Homebrew tap instead of a package"
         echo "  --help, -h  Show this help message"
         echo ""
         echo "Examples:"
-        echo "  brew-add ripgrep              # auto-detect type"
-        echo "  brew-add --cask firefox       # explicitly add as cask"
-        echo "  brew-add --tap homebrew/cask  # add a tap"
+        echo "  brew-add ripgrep                 # auto-detect type → Brewfile"
+        echo "  brew-add -o --cask obsidian      # add cask → Brewfile.optional"
+        echo "  brew-add --tap homebrew/cask     # add a tap"
         echo ""
         echo "Workflow: git pull → detect type → add to Brewfile → brew bundle → git commit → git push"
         return 0
         ;;
+      -o)        optional=true; shift ;;
       --formula) pkg_type="formula"; user_specified_type=true; shift ;;
       --cask)    pkg_type="cask";    user_specified_type=true; shift ;;
       --tap)     pkg_type="tap";     user_specified_type=true; shift ;;
@@ -49,9 +53,11 @@ brew-add() {
   done
 
   if [[ -z "$pkg_name" ]]; then
-    echo "Usage: brew-add [--cask|--tap|--formula] <package>"
+    echo "Usage: brew-add [-o] [--cask|--tap|--formula] <package>"
     return 1
   fi
+
+  [[ "$optional" == "true" ]] && BREWFILE="$DOTFILES/Brewfile.optional"
 
   # Step 1: Git pull
   echo "Pulling latest dotfiles..."
@@ -108,13 +114,13 @@ brew-add() {
 
   # Step 4: Check for duplicates
   if grep -qF "$brewfile_line" "$BREWFILE"; then
-    echo "brew-add: '$pkg_name' is already in the Brewfile ($brewfile_line)"
+    echo "brew-add: '$pkg_name' is already in $(basename "$BREWFILE") ($brewfile_line)"
     return 0
   fi
 
   # Step 5: Append to Brewfile
   echo "$brewfile_line" >> "$BREWFILE"
-  echo "Added to Brewfile: $brewfile_line"
+  echo "Added to $(basename "$BREWFILE"): $brewfile_line"
 
   # Step 6: Run brew bundle
   echo ""
@@ -140,13 +146,15 @@ brew-add() {
     fi
 
     git -C "$DOTFILES" checkout -- "$BREWFILE"
-    echo "Reverted Brewfile"
+    echo "Reverted $(basename "$BREWFILE")"
     return 1
   fi
 
   # Step 7: Commit
+  local brewfile_label
+  [[ "$optional" == "true" ]] && brewfile_label="Brewfile.optional" || brewfile_label="Brewfile"
   echo ""
-  echo "Committing Brewfile..."
+  echo "Committing $brewfile_label..."
   git -C "$DOTFILES" add "$BREWFILE"
   git -C "$DOTFILES" commit -m "brew: add $pkg_name"
 
@@ -164,5 +172,5 @@ brew-add() {
   echo "Pushing to origin main..."
   git -C "$DOTFILES" push origin main
   echo ""
-  echo "Done! '$pkg_name' added, installed, and pushed."
+  echo "Done! '$pkg_name' added to $brewfile_label, installed, and pushed."
 }
