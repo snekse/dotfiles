@@ -45,12 +45,10 @@ brew-remove() {
   local found_mas_ids=()
 
   for brewfile in "${brewfiles[@]}"; do
-    local match_info
-    match_info=$(grep -nF "\"$pkg_name\"" "$brewfile" 2>/dev/null | head -1)
+    local match_info=$(grep -nF "\"$pkg_name\"" "$brewfile" 2>/dev/null | head -1)
     [[ -z "$match_info" ]] && continue
 
     local line="${match_info#*:}"
-    line="${line#"${line%%[! ]*}"}"  # trim leading whitespace
 
     local pkg_type mas_id=""
     if   [[ "$line" == brew\ * ]];  then pkg_type="formula"
@@ -76,12 +74,12 @@ brew-remove() {
 
   # Step 2: Build display of what will happen, then confirm
   echo "Found '$pkg_name':"
-  for i in "${!found_files[@]}"; do
+  for i in {1..${#found_files[@]}}; do
     echo "  $(basename "${found_files[$i]}"): ${found_lines[$i]}"
   done
   echo ""
   echo "This will:"
-  for i in "${!found_types[@]}"; do
+  for i in {1..${#found_types[@]}}; do
     case "${found_types[$i]}" in
       formula) echo "  - Run: brew uninstall \"$pkg_name\"" ;;
       cask)    echo "  - Run: brew uninstall --cask \"$pkg_name\"" ;;
@@ -123,7 +121,7 @@ brew-remove() {
   fi
 
   # Step 4: Uninstall from brew
-  for i in "${!found_types[@]}"; do
+  for i in {1..${#found_types[@]}}; do
     case "${found_types[$i]}" in
       formula)
         echo "Running: brew uninstall \"$pkg_name\""
@@ -150,7 +148,7 @@ brew-remove() {
 
   # Step 5: Remove lines from Brewfiles
   # Re-find line numbers after pull in case the file changed
-  for i in "${!found_files[@]}"; do
+  for i in {1..${#found_files[@]}}; do
     local file="${found_files[$i]}"
     local line_num
     line_num=$(grep -nF "\"$pkg_name\"" "$file" 2>/dev/null | head -1 | cut -d: -f1)
