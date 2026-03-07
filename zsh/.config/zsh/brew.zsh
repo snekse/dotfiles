@@ -25,21 +25,27 @@ _brew_detect_type() {
 brew-remove() {
   local DOTFILES="$HOME/dotfiles"
   local pkg_name=""
+  local skip_git=0
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --help|-h)
-        echo "Usage: brew-remove <package>"
+        echo "Usage: brew-remove [-S] <package>"
         echo ""
         echo "Uninstall a package and remove it from Brewfile or Brewfile.optional,"
         echo "then commit and push the change."
+        echo ""
+        echo "Options:"
+        echo "  -S, --skip-git-commit   Skip git pull, commit, and push"
         echo ""
         echo "Examples:"
         echo "  brew-remove ripgrep"
         echo "  brew-remove nikitabobko/tap/aerospace"
         echo "  brew-remove \"Slack for Desktop\"   # mas app (use quoted name)"
+        echo "  brew-remove -S ripgrep             # uninstall only, no git sync"
         return 0
         ;;
+      -S|--skip-git-commit) skip_git=1; shift ;;
       -*) echo "brew-remove: unknown flag '$1'"; return 1 ;;
       *)  pkg_name="$1"; shift ;;
     esac
@@ -102,7 +108,7 @@ brew-remove() {
     esac
     echo "  - Remove from: $(basename "${found_files[$i]}")"
   done
-  echo "  - Commit and push the changes"
+  (( skip_git )) || echo "  - Commit and push the changes"
   echo ""
   read -q "?Are you sure? (y/n) "
   local confirm=$?
@@ -113,23 +119,25 @@ brew-remove() {
   fi
 
   # Step 3: Git pull
-  echo ""
-  echo "Pulling latest dotfiles..."
-  if ! git -C "$DOTFILES" pull origin main; then
-    echo "brew-remove: git pull failed — aborting"
-    return 1
-  fi
+  if (( !skip_git )); then
+    echo ""
+    echo "Pulling latest dotfiles..."
+    if ! git -C "$DOTFILES" pull origin main; then
+      echo "brew-remove: git pull failed — aborting"
+      return 1
+    fi
 
-  local dirty=$(git -C "$DOTFILES" status --porcelain)
-  if [[ -n "$dirty" ]]; then
-    echo ""
-    echo "Warning: dotfiles repo is dirty after pull:"
-    echo "$dirty"
-    echo ""
-    read -q "?Continue anyway? (y/n) "
-    local cont=$?
-    echo
-    [[ $cont -ne 0 ]] && return 1
+    local dirty=$(git -C "$DOTFILES" status --porcelain)
+    if [[ -n "$dirty" ]]; then
+      echo ""
+      echo "Warning: dotfiles repo is dirty after pull:"
+      echo "$dirty"
+      echo ""
+      read -q "?Continue anyway? (y/n) "
+      local cont=$?
+      echo
+      [[ $cont -ne 0 ]] && return 1
+    fi
   fi
 
   # Step 4: Uninstall from brew
@@ -169,7 +177,13 @@ brew-remove() {
     fi
   done
 
-  # Step 6: Commit
+  # Step 6: Commit and push
+  if (( skip_git )); then
+    echo ""
+    echo "Done! '$pkg_name' uninstalled and removed from Brewfile (git sync skipped)."
+    return 0
+  fi
+
   echo ""
   echo "Committing changes..."
   for file in "${found_files[@]}"; do
@@ -212,17 +226,19 @@ brew-add() {
   local user_specified_type=0
   local pkg_name=""
   local optional=0
+  local skip_git=0
 
   # Parse arguments
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --help|-h)
-        echo "Usage: brew-add [-o] [--cask|--tap|--formula] <package>"
+        echo "Usage: brew-add [-o] [-S] [--cask|--tap|--formula] <package>"
         echo ""
         echo "Add a package to the dotfiles Brewfile, install it, and sync the repo."
         echo ""
         echo "Options:"
         echo "  -o          Add to Brewfile.optional instead of Brewfile"
+        echo "  -S, --skip-git-commit   Skip git pull, commit, and push"
         echo "  --formula   Force add as a Homebrew formula (default when auto-detected)"
         echo "  --cask      Force add as a Homebrew cask (GUI apps)"
         echo "  --tap       Add a Homebrew tap instead of a package"
@@ -231,12 +247,14 @@ brew-add() {
         echo "Examples:"
         echo "  brew-add ripgrep                 # auto-detect type → Brewfile"
         echo "  brew-add -o --cask obsidian      # add cask → Brewfile.optional"
+        echo "  brew-add -S ripgrep              # install only, no git sync"
         echo "  brew-add --tap homebrew/cask     # add a tap"
         echo ""
         echo "Workflow: git pull → detect type → add to Brewfile → brew bundle → git commit → git push"
         return 0
         ;;
-      -o)        optional=1; shift ;;
+      -o)                  optional=1; shift ;;
+      -S|--skip-git-commit) skip_git=1; shift ;;
       --formula) pkg_type="formula"; user_specified_type=1; shift ;;
       --cask)    pkg_type="cask";    user_specified_type=1; shift ;;
       --tap)     pkg_type="tap";     user_specified_type=1; shift ;;
@@ -246,7 +264,7 @@ brew-add() {
   done
 
   if [[ -z "$pkg_name" ]]; then
-    echo "Usage: brew-add [-o] [--cask|--tap|--formula] <package>"
+    echo "Usage: brew-add [-o] [-S] [--cask|--tap|--formula] <package>"
     return 1
   fi
 
@@ -255,20 +273,22 @@ brew-add() {
   local brewfile_label=$(basename "$BREWFILE")
 
   # Step 1: Git pull
-  echo "Pulling latest dotfiles..."
-  if ! git -C "$DOTFILES" pull origin main; then
-    echo "brew-add: git pull failed — aborting"
-    return 1
-  fi
+  if (( !skip_git )); then
+    echo "Pulling latest dotfiles..."
+    if ! git -C "$DOTFILES" pull origin main; then
+      echo "brew-add: git pull failed — aborting"
+      return 1
+    fi
 
-  local dirty=$(git -C "$DOTFILES" status --porcelain)
-  if [[ -n "$dirty" ]]; then
-    echo ""
-    echo "Warning: dotfiles repo is dirty after pull:"
-    echo "$dirty"
-    echo ""
-    read -q "?Continue anyway? (y/n) " || { echo; return 1; }
-    echo
+    local dirty=$(git -C "$DOTFILES" status --porcelain)
+    if [[ -n "$dirty" ]]; then
+      echo ""
+      echo "Warning: dotfiles repo is dirty after pull:"
+      echo "$dirty"
+      echo ""
+      read -q "?Continue anyway? (y/n) " || { echo; return 1; }
+      echo
+    fi
   fi
 
   # Step 2: Auto-detect type if not specified
@@ -293,6 +313,34 @@ brew-add() {
   # Step 4: Check for duplicates
   if grep -qF "$brewfile_line" "$BREWFILE"; then
     echo "brew-add: '$pkg_name' is already in $brewfile_label ($brewfile_line)"
+
+    if [[ "$pkg_type" != "tap" ]]; then
+      local installed_version
+      if [[ "$pkg_type" == "cask" ]]; then
+        installed_version=$(HOMEBREW_NO_AUTO_UPDATE=1 brew list --cask --versions "$pkg_name" 2>/dev/null)
+      else
+        installed_version=$(HOMEBREW_NO_AUTO_UPDATE=1 brew list --versions "$pkg_name" 2>/dev/null)
+      fi
+
+      if [[ -z "$installed_version" ]]; then
+        echo "Note: not currently installed. Run 'brew bundle --file=$BREWFILE' to install it."
+      else
+        local outdated
+        if [[ "$pkg_type" == "cask" ]]; then
+          outdated=$(HOMEBREW_NO_AUTO_UPDATE=1 brew outdated --cask "$pkg_name" 2>/dev/null)
+        else
+          outdated=$(HOMEBREW_NO_AUTO_UPDATE=1 brew outdated "$pkg_name" 2>/dev/null)
+        fi
+
+        if [[ -n "$outdated" ]]; then
+          echo "Installed but outdated: $outdated"
+          echo "Run 'brew upgrade $pkg_name' to update."
+        else
+          echo "Installed and up to date: $installed_version"
+        fi
+      fi
+    fi
+
     return 0
   fi
 
@@ -329,13 +377,21 @@ brew-add() {
           echo "Hint: '$pkg_name' appears to be a $detected_type — try: brew-add --$detected_type $pkg_name"
         fi
       fi
-      git -C "$DOTFILES" checkout -- "$BREWFILE"
-      echo "Reverted $brewfile_label"
+      if (( !skip_git )); then
+        git -C "$DOTFILES" checkout -- "$BREWFILE"
+        echo "Reverted $brewfile_label"
+      fi
       return 1
     fi
   fi
 
-  # Step 7: Commit
+  # Step 7: Commit and push
+  if (( skip_git )); then
+    echo ""
+    echo "Done! '$pkg_name' added to $brewfile_label, installed (git sync skipped)."
+    return 0
+  fi
+
   echo ""
   echo "Committing $brewfile_label..."
   git -C "$DOTFILES" add "$BREWFILE"
