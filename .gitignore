@@ -1,5 +1,6 @@
-# "Dotfiles Project" specific
-.claude/
+# "Dotfiles Project" specific — exclude local settings, allow committed commands
+.claude/*
+!.claude/commands/
 
 # Fish
 /fish/completions/*.fish
