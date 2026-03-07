@@ -25,6 +25,7 @@ just brew-check      # Check what brew bundle would change
 just setup           # Interactive new-machine setup (zsh + git local configs)
 just setup-zsh       # Write ~/.zshrc.local with DEV path and optional CONFLUENT_HOME
 just setup-git       # Write ~/.gitconfig.local with name and email
+just macos           # Apply macOS system defaults (run explicitly, never automatic)
 ```
 
 ## Stow: How Symlinks Work

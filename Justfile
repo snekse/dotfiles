@@ -42,6 +42,10 @@ update:
     -nvm install --lts --reinstall-packages-from=current
     -rbenv update || true
 
+# Apply macOS system defaults (run explicitly, not part of just install)
+macos:
+    bash macos/defaults.sh
+
 # Check what brew bundle would change
 brew-check:
     brew bundle check --file=Brewfile
