@@ -2,6 +2,19 @@
 # Homebrew helpers
 # =============================================================================
 
+# Detect whether a package is a "formula", "cask", or "" (not found).
+# Uses brew exit codes only — no JSON, no jq.
+_brew_detect_type() {
+  local pkg="$1"
+  if HOMEBREW_NO_AUTO_UPDATE=1 brew info --cask "$pkg" &>/dev/null; then
+    echo "cask"
+  elif HOMEBREW_NO_AUTO_UPDATE=1 brew info --json "$pkg" &>/dev/null; then
+    echo "formula"
+  else
+    echo ""
+  fi
+}
+
 # Remove a package from the Brewfile (or Brewfile.optional), uninstall it,
 # and sync the repo.
 #
@@ -51,12 +64,12 @@ brew-remove() {
     local line="${match_info#*:}"
 
     local pkg_type mas_id=""
-    if   [[ "$line" == brew\ * ]];  then pkg_type="formula"
-    elif [[ "$line" == cask\ * ]];  then pkg_type="cask"
-    elif [[ "$line" == tap\ * ]];   then pkg_type="tap"
-    elif [[ "$line" == mas\ * ]];   then
+    if   [[ "$line" == brew\ * ]]; then pkg_type="formula"
+    elif [[ "$line" == cask\ * ]]; then pkg_type="cask"
+    elif [[ "$line" == tap\ * ]];  then pkg_type="tap"
+    elif [[ "$line" == mas\ * ]];  then
       pkg_type="mas"
-      mas_id=$(echo "$line" | grep -oE 'id: [0-9]+' | grep -oE '[0-9]+')
+      mas_id="${line##*, id: }"
     else
       pkg_type="unknown"
     fi
@@ -72,7 +85,7 @@ brew-remove() {
     return 1
   fi
 
-  # Step 2: Build display of what will happen, then confirm
+  # Step 2: Show what will happen, then confirm
   echo "Found '$pkg_name':"
   for i in {1..${#found_files[@]}}; do
     echo "  $(basename "${found_files[$i]}"): ${found_lines[$i]}"
@@ -107,8 +120,7 @@ brew-remove() {
     return 1
   fi
 
-  local dirty
-  dirty=$(git -C "$DOTFILES" status --porcelain)
+  local dirty=$(git -C "$DOTFILES" status --porcelain)
   if [[ -n "$dirty" ]]; then
     echo ""
     echo "Warning: dotfiles repo is dirty after pull:"
@@ -146,14 +158,11 @@ brew-remove() {
     esac
   done
 
-  # Step 5: Remove lines from Brewfiles
-  # Re-find line numbers after pull in case the file changed
+  # Step 5: Remove lines from Brewfiles (re-check after pull in case file changed)
   for i in {1..${#found_files[@]}}; do
     local file="${found_files[$i]}"
-    local line_num
-    line_num=$(grep -nF "\"$pkg_name\"" "$file" 2>/dev/null | head -1 | cut -d: -f1)
-    if [[ -n "$line_num" ]]; then
-      sed -i '' "${line_num}d" "$file"
+    if grep -qF "\"$pkg_name\"" "$file" 2>/dev/null; then
+      grep -vF "\"$pkg_name\"" "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
       echo "Removed from $(basename "$file"): ${found_lines[$i]}"
     else
       echo "Warning: '${found_lines[$i]}' no longer in $(basename "$file") — skipping"
@@ -168,7 +177,7 @@ brew-remove() {
   done
   git -C "$DOTFILES" commit -m "brew: remove $pkg_name"
 
-  dirty=$(git -C "$DOTFILES" status --porcelain)
+  local dirty=$(git -C "$DOTFILES" status --porcelain)
   if [[ -n "$dirty" ]]; then
     echo ""
     echo "Warning: repo has unexpected changes after commit:"
@@ -199,11 +208,10 @@ brew-remove() {
 # Workflow: git pull → detect type → add to Brewfile → brew bundle → git commit → git push
 brew-add() {
   local DOTFILES="$HOME/dotfiles"
-  local BREWFILE="$DOTFILES/Brewfile"
   local pkg_type=""
-  local user_specified_type=false
+  local user_specified_type=0
   local pkg_name=""
-  local optional=false
+  local optional=0
 
   # Parse arguments
   while [[ $# -gt 0 ]]; do
@@ -228,10 +236,10 @@ brew-add() {
         echo "Workflow: git pull → detect type → add to Brewfile → brew bundle → git commit → git push"
         return 0
         ;;
-      -o)        optional=true; shift ;;
-      --formula) pkg_type="formula"; user_specified_type=true; shift ;;
-      --cask)    pkg_type="cask";    user_specified_type=true; shift ;;
-      --tap)     pkg_type="tap";     user_specified_type=true; shift ;;
+      -o)        optional=1; shift ;;
+      --formula) pkg_type="formula"; user_specified_type=1; shift ;;
+      --cask)    pkg_type="cask";    user_specified_type=1; shift ;;
+      --tap)     pkg_type="tap";     user_specified_type=1; shift ;;
       -*)        echo "brew-add: unknown flag '$1'"; return 1 ;;
       *)         pkg_name="$1"; shift ;;
     esac
@@ -242,7 +250,9 @@ brew-add() {
     return 1
   fi
 
-  [[ "$optional" == "true" ]] && BREWFILE="$DOTFILES/Brewfile.optional"
+  local BREWFILE
+  (( optional )) && BREWFILE="$DOTFILES/Brewfile.optional" || BREWFILE="$DOTFILES/Brewfile"
+  local brewfile_label=$(basename "$BREWFILE")
 
   # Step 1: Git pull
   echo "Pulling latest dotfiles..."
@@ -251,8 +261,7 @@ brew-add() {
     return 1
   fi
 
-  local dirty
-  dirty=$(git -C "$DOTFILES" status --porcelain)
+  local dirty=$(git -C "$DOTFILES" status --porcelain)
   if [[ -n "$dirty" ]]; then
     echo ""
     echo "Warning: dotfiles repo is dirty after pull:"
@@ -263,54 +272,37 @@ brew-add() {
   fi
 
   # Step 2: Auto-detect type if not specified
-  if [[ "$user_specified_type" == "false" ]]; then
+  if (( !user_specified_type )); then
     echo "Detecting '$pkg_name' in Homebrew..."
-    local info_json
-    info_json=$(HOMEBREW_NO_AUTO_UPDATE=1 brew info --json=v2 "$pkg_name" 2>/dev/null)
-
-    if [[ $? -ne 0 ]] || [[ -z "$info_json" ]]; then
+    pkg_type=$(_brew_detect_type "$pkg_name")
+    if [[ -z "$pkg_type" ]]; then
       echo "brew-add: '$pkg_name' not found in Homebrew"
       return 1
     fi
-
-    local has_formula has_cask
-    has_formula=$(echo "$info_json" | jq -r '.formulae | length')
-    has_cask=$(echo "$info_json" | jq -r '.casks | length')
-
-    if [[ "$has_cask" -gt 0 && "$has_formula" -eq 0 ]]; then
-      pkg_type="cask"
-    elif [[ "$has_formula" -gt 0 ]]; then
-      pkg_type="formula"
-    else
-      echo "brew-add: could not determine type for '$pkg_name'"
-      return 1
-    fi
-
     echo "Detected: $pkg_type"
   fi
 
   # Step 3: Format Brewfile line
   local brewfile_line
   case "$pkg_type" in
-    cask)    brewfile_line="cask \"$pkg_name\"" ;;
-    tap)     brewfile_line="tap \"$pkg_name\"" ;;
-    *)       brewfile_line="brew \"$pkg_name\"" ;;
+    cask) brewfile_line="cask \"$pkg_name\"" ;;
+    tap)  brewfile_line="tap \"$pkg_name\"" ;;
+    *)    brewfile_line="brew \"$pkg_name\"" ;;
   esac
 
   # Step 4: Check for duplicates
   if grep -qF "$brewfile_line" "$BREWFILE"; then
-    echo "brew-add: '$pkg_name' is already in $(basename "$BREWFILE") ($brewfile_line)"
+    echo "brew-add: '$pkg_name' is already in $brewfile_label ($brewfile_line)"
     return 0
   fi
 
   # Step 5: Append to Brewfile
   echo "$brewfile_line" >> "$BREWFILE"
-  echo "Added to $(basename "$BREWFILE"): $brewfile_line"
+  echo "Added to $brewfile_label: $brewfile_line"
 
   # Step 6: Install
   echo ""
-  local install_failed=false
-  if [[ "$optional" == "true" ]]; then
+  if (( optional )); then
     read -q "?Install '$pkg_name' now? Answering 'N' will just add the pkg to \`Brewfile.optional\`. (y/n) "
     local install_now=$?
     echo
@@ -322,7 +314,6 @@ brew-add() {
       if ! "${brew_install_cmd[@]}" "$pkg_name"; then
         echo ""
         echo "brew-add: install failed"
-        install_failed=true
       fi
     else
       echo "Skipping install — '$pkg_name' is recorded in Brewfile.optional for later."
@@ -332,40 +323,25 @@ brew-add() {
     if ! brew bundle --file="$BREWFILE"; then
       echo ""
       echo "brew-add: brew bundle failed"
-      install_failed=true
-    fi
-
-    if [[ "$install_failed" == "true" ]]; then
-      if [[ "$user_specified_type" == "true" ]]; then
-        echo "Checking whether '$pkg_name' has a different type..."
-        local info_json
-        info_json=$(HOMEBREW_NO_AUTO_UPDATE=1 brew info --json=v2 "$pkg_name" 2>/dev/null)
-        if [[ $? -eq 0 && -n "$info_json" ]]; then
-          local has_formula has_cask
-          has_formula=$(echo "$info_json" | jq -r '.formulae | length')
-          has_cask=$(echo "$info_json" | jq -r '.casks | length')
-          if [[ "$has_cask" -gt 0 && "$pkg_type" != "cask" ]]; then
-            echo "Hint: '$pkg_name' appears to be a cask — try: brew-add --cask $pkg_name"
-          elif [[ "$has_formula" -gt 0 && "$pkg_type" != "formula" ]]; then
-            echo "Hint: '$pkg_name' appears to be a formula — try: brew-add $pkg_name"
-          fi
+      if (( user_specified_type )); then
+        local detected_type=$(_brew_detect_type "$pkg_name")
+        if [[ -n "$detected_type" && "$detected_type" != "$pkg_type" ]]; then
+          echo "Hint: '$pkg_name' appears to be a $detected_type — try: brew-add --$detected_type $pkg_name"
         fi
       fi
       git -C "$DOTFILES" checkout -- "$BREWFILE"
-      echo "Reverted $(basename "$BREWFILE")"
+      echo "Reverted $brewfile_label"
       return 1
     fi
   fi
 
   # Step 7: Commit
-  local brewfile_label
-  [[ "$optional" == "true" ]] && brewfile_label="Brewfile.optional" || brewfile_label="Brewfile"
   echo ""
   echo "Committing $brewfile_label..."
   git -C "$DOTFILES" add "$BREWFILE"
   git -C "$DOTFILES" commit -m "brew: add $pkg_name"
 
-  dirty=$(git -C "$DOTFILES" status --porcelain)
+  local dirty=$(git -C "$DOTFILES" status --porcelain)
   if [[ -n "$dirty" ]]; then
     echo ""
     echo "Warning: repo has unexpected changes after commit:"
