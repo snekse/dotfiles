@@ -62,6 +62,7 @@ Custom functions are defined in `zsh/.config/zsh/` and auto-sourced by `.zshrc`.
 | Function | Description |
 |---|---|
 | `brew-add [-o] [--cask\|--tap\|--formula] <pkg>` | Add a package to the Brewfile, install it, and sync the repo (pull → install → commit → push). Auto-detects formula vs cask if no flag given. Pass `-o` to target `Brewfile.optional` instead. |
+| `brew-remove <pkg>` | Uninstall a package and remove it from whichever Brewfile it lives in, then commit and push. Searches both Brewfiles, identifies type (formula/cask/tap/mas), and confirms before doing anything. |
 
 ### Filesystem & Network (`functions.zsh`)
 
