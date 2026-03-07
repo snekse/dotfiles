@@ -47,9 +47,8 @@ Build
 tags
 TAGS
 
-# Shell history (never symlink history files)
-\.zshhistory
-\.bash_history
+# Shell & REPL history (never symlink history files)
+\..+_history
 
 # Python
 \.mypy_cache
@@ -75,3 +74,24 @@ COPYING
 
 # JS tooling
 ^/node_modules
+
+# Cloud & infrastructure credentials (never stow)
+^\.aws$
+^\.azure$
+^\.terraform\.d$
+^\.kube$
+
+# Package manager & tool credentials (never stow)
+^\.npmrc$
+^\.pypirc$
+^\.gem$
+^\.docker$
+^\.git-credentials$
+
+
+# Encryption & identity (never stow)
+^\.gnupg$
+^\.gpg$
+.*\.pem$
+.*\.key$
+.*\.pkcs12$

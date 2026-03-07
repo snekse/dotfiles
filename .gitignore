@@ -26,3 +26,28 @@ Thumbs.db
 
 # Files that might appear on external disks
 .Trashes
+
+# Cloud & infrastructure credentials
+.aws/
+.azure/
+.config/gcloud/
+.kube/
+.terraform.d/
+
+# Package manager & tool credentials
+.npmrc
+.pypirc
+.gem/
+auth.json
+.docker/config.json
+.git-credentials
+
+# Shell & REPL history
+.*_history
+
+# Encryption & identity
+.gnupg/
+.gpg/
+*.pem
+*.key
+*.pkcs12
