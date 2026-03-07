@@ -127,8 +127,9 @@ brew-add() {
   local install_failed=false
   if [[ "$optional" == "true" ]]; then
     read -q "?Install '$pkg_name' now? Answering 'N' will just add the pkg to \`Brewfile.optional\`. (y/n) "
+    local install_now=$?
     echo
-    if [[ $? -eq 0 ]]; then
+    if [[ $install_now -eq 0 ]]; then
       echo "Running brew install..."
       local brew_install_cmd=(brew install)
       [[ "$pkg_type" == "cask" ]] && brew_install_cmd+=(--cask)
