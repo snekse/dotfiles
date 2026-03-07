@@ -2,12 +2,11 @@
 set -e
 
 if [[ -d "$HOME/.sdkman" ]]; then
-  echo "==> SDKMAN already installed, skipping"
-  exit 0
+  echo "==> SDKMAN already installed, skipping installer"
+else
+  echo "==> Installing SDKMAN..."
+  curl -s "https://get.sdkman.io?ci=true" | bash
 fi
-
-echo "==> Installing SDKMAN..."
-curl -s "https://get.sdkman.io?ci=true" | bash
 
 # Source SDKMAN to use it immediately
 source "$HOME/.sdkman/bin/sdkman-init.sh"
@@ -19,7 +18,11 @@ JAVA_VERSION=$(SDKMAN_COLOUR=false sdk list java 2>/dev/null \
   | grep 'LTS' \
   | head -1 \
   | awk '{print $NF}')
-sdk install java "$JAVA_VERSION"
+if sdk list java | grep -q "installed.*${JAVA_VERSION}"; then
+  echo "==> Java $JAVA_VERSION already installed, skipping"
+else
+  sdk install java "$JAVA_VERSION"
+fi
 sdk default java "$JAVA_VERSION"
 
 # Install additional candidates as needed

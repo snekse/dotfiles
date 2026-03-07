@@ -9,6 +9,10 @@ install: brew-install link install-runtimes
 link:
     stow zsh git starship
 
+# Restow all packages (use to apply structural changes without conflicts)
+relink:
+    stow --restow zsh git starship
+
 # Unstow all packages
 unlink:
     stow -D zsh git starship

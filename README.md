@@ -18,6 +18,7 @@ cd ~/dotfiles
 just                 # List all available targets
 just install         # Full install: stow packages + brew bundle
 just link            # Stow all packages
+just relink          # Restow all packages (use after structural changes to resolve stale symlinks)
 just unlink          # Unstow all packages
 just install-apps    # Install optional GUI apps (casks, App Store)
 just update          # Upgrade brew packages
