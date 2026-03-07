@@ -49,6 +49,11 @@ After `just install`, run on each new machine:
 2. `just macos` — apply macOS defaults (optional, review first)
 3. Configure SSH keys manually (not in repo)
 
+## README Maintenance
+
+- When adding, removing, or altering a shell function — especially environment-management functions like `brew-add` — update the **Shell Functions** section in `README.md` so users can discover available functions without reading source code.
+- Significant functions (those that manage packages, git, runtimes, or machine config) must always be documented in the README.
+
 ## Key Constraints
 
 - SSH config is **not committed** to the repo — documented as a manual post-install step

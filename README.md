@@ -53,6 +53,34 @@ README\.md
 
 **Gotcha — stow ignores `.gitignore` by default:** Stow's built-in default ignore list includes `.gitignore`, so a `git/.gitignore` package file will silently not be symlinked unless you override this. The fix is a `.stow-local-ignore` in the package directory — but note that creating one **replaces** the entire default list, so you must re-add any other defaults you still want (`.git`, `.gitmodules`, etc.). See [stow ignore list docs](https://www.gnu.org/software/stow/manual/html_node/Types-And-Syntax-Of-Ignore-Lists.html) and [issue #75](https://github.com/aspiers/stow/issues/75) for details. The `git/` package in this repo includes a `.stow-local-ignore` that handles this.
 
+## Shell Functions
+
+Custom functions are defined in `zsh/.config/zsh/` and auto-sourced by `.zshrc`.
+
+### Homebrew (`brew.zsh`)
+
+| Function | Description |
+|---|---|
+| `brew-add [--cask\|--tap\|--formula] <pkg>` | Add a package to the Brewfile, install it, and sync the repo (pull → install → commit → push). Auto-detects formula vs cask if no flag given. |
+
+### Filesystem & Network (`functions.zsh`)
+
+| Function | Description |
+|---|---|
+| `mkcd <dir>` | Create a directory and `cd` into it in one step |
+| `serve [port]` | Spin up a Python HTTP server in the current directory (default port 8000) |
+| `port <number>` | Show all connections on a given port |
+| `whatIsOnPort <number>` | Show processes listening on a given port (IPv4 TCP only) |
+
+### Docker Compose (`functions.zsh`)
+
+| Function | Description |
+|---|---|
+| `dcUp [file]` | Start all services in detached mode |
+| `dcUpJust [file] <service>` | Start a single service without recreating dependencies |
+| `dcPull [file]` | Pull updated images for all services |
+| `dcDown [file]` | Stop and remove all containers, networks, and volumes |
+
 ## Manual Steps
 
 These cannot be automated and must be done by hand:
