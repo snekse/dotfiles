@@ -266,7 +266,7 @@ brew-add() {
   if [[ "$user_specified_type" == "false" ]]; then
     echo "Detecting '$pkg_name' in Homebrew..."
     local info_json
-    info_json=$(brew info --json=v2 "$pkg_name" 2>/dev/null)
+    info_json=$(HOMEBREW_NO_AUTO_UPDATE=1 brew info --json=v2 "$pkg_name" 2>/dev/null)
 
     if [[ $? -ne 0 ]] || [[ -z "$info_json" ]]; then
       echo "brew-add: '$pkg_name' not found in Homebrew"
@@ -339,7 +339,7 @@ brew-add() {
       if [[ "$user_specified_type" == "true" ]]; then
         echo "Checking whether '$pkg_name' has a different type..."
         local info_json
-        info_json=$(brew info --json=v2 "$pkg_name" 2>/dev/null)
+        info_json=$(HOMEBREW_NO_AUTO_UPDATE=1 brew info --json=v2 "$pkg_name" 2>/dev/null)
         if [[ $? -eq 0 && -n "$info_json" ]]; then
           local has_formula has_cask
           has_formula=$(echo "$info_json" | jq -r '.formulae | length')
