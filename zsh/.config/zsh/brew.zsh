@@ -122,32 +122,53 @@ brew-add() {
   echo "$brewfile_line" >> "$BREWFILE"
   echo "Added to $(basename "$BREWFILE"): $brewfile_line"
 
-  # Step 6: Run brew bundle
+  # Step 6: Install
   echo ""
-  echo "Running brew bundle..."
-  if ! brew bundle --file="$BREWFILE"; then
-    echo ""
-    echo "brew-add: brew bundle failed"
-
-    if [[ "$user_specified_type" == "true" ]]; then
-      echo "Checking whether '$pkg_name' has a different type..."
-      local info_json
-      info_json=$(brew info --json=v2 "$pkg_name" 2>/dev/null)
-      if [[ $? -eq 0 && -n "$info_json" ]]; then
-        local has_formula has_cask
-        has_formula=$(echo "$info_json" | jq -r '.formulae | length')
-        has_cask=$(echo "$info_json" | jq -r '.casks | length')
-        if [[ "$has_cask" -gt 0 && "$pkg_type" != "cask" ]]; then
-          echo "Hint: '$pkg_name' appears to be a cask — try: brew-add --cask $pkg_name"
-        elif [[ "$has_formula" -gt 0 && "$pkg_type" != "formula" ]]; then
-          echo "Hint: '$pkg_name' appears to be a formula — try: brew-add $pkg_name"
-        fi
+  local install_failed=false
+  if [[ "$optional" == "true" ]]; then
+    read -q "?Install '$pkg_name' now? Answering 'N' will just add the pkg to \`Brewfile.optional\`. (y/n) "
+    echo
+    if [[ $? -eq 0 ]]; then
+      echo "Running brew install..."
+      local brew_install_cmd=(brew install)
+      [[ "$pkg_type" == "cask" ]] && brew_install_cmd+=(--cask)
+      [[ "$pkg_type" == "tap"  ]] && brew_install_cmd=(brew tap)
+      if ! "${brew_install_cmd[@]}" "$pkg_name"; then
+        echo ""
+        echo "brew-add: install failed"
+        install_failed=true
       fi
+    else
+      echo "Skipping install — '$pkg_name' is recorded in Brewfile.optional for later."
+    fi
+  else
+    echo "Running brew bundle..."
+    if ! brew bundle --file="$BREWFILE"; then
+      echo ""
+      echo "brew-add: brew bundle failed"
+      install_failed=true
     fi
 
-    git -C "$DOTFILES" checkout -- "$BREWFILE"
-    echo "Reverted $(basename "$BREWFILE")"
-    return 1
+    if [[ "$install_failed" == "true" ]]; then
+      if [[ "$user_specified_type" == "true" ]]; then
+        echo "Checking whether '$pkg_name' has a different type..."
+        local info_json
+        info_json=$(brew info --json=v2 "$pkg_name" 2>/dev/null)
+        if [[ $? -eq 0 && -n "$info_json" ]]; then
+          local has_formula has_cask
+          has_formula=$(echo "$info_json" | jq -r '.formulae | length')
+          has_cask=$(echo "$info_json" | jq -r '.casks | length')
+          if [[ "$has_cask" -gt 0 && "$pkg_type" != "cask" ]]; then
+            echo "Hint: '$pkg_name' appears to be a cask — try: brew-add --cask $pkg_name"
+          elif [[ "$has_formula" -gt 0 && "$pkg_type" != "formula" ]]; then
+            echo "Hint: '$pkg_name' appears to be a formula — try: brew-add $pkg_name"
+          fi
+        fi
+      fi
+      git -C "$DOTFILES" checkout -- "$BREWFILE"
+      echo "Reverted $(basename "$BREWFILE")"
+      return 1
+    fi
   fi
 
   # Step 7: Commit
