@@ -58,3 +58,4 @@ brew "lazydocker"       # terminal UI for Docker and Docker Compose
 brew "git-lfs"          # Git Large File Storage — handles binary assets in repos
 brew "gitleaks"
 brew "zsh-syntax-highlighting"
+brew "glow"
