@@ -2,6 +2,9 @@
 .claude/*
 !.claude/commands/
 
+# Override global gitignore's "bin/" rule — this bin/ holds standalone scripts on $PATH
+!bin/
+
 # Fish
 /fish/completions/*.fish
 /fish/fish_variables
