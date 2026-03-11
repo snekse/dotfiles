@@ -59,3 +59,4 @@ brew "git-lfs"          # Git Large File Storage — handles binary assets in re
 brew "gitleaks"
 brew "zsh-syntax-highlighting"
 brew "glow"
+brew "gnupg"
