@@ -10,7 +10,7 @@ cd ~/dotfiles
 ./install.sh
 ```
 
-`install.sh` will install Homebrew and `just` if needed, then run `just install` to stow all packages and install core CLI tools.
+`install.sh` will install Homebrew and `just` if needed, then stow dotfiles, pause to guide SSH key setup (generating a key and verifying GitHub connectivity if needed), then install language runtimes.
 
 ## Commands
 
@@ -26,6 +26,9 @@ just brew-check      # Check what brew bundle would change
 just setup           # Interactive new-machine setup (zsh + git local configs)
 just setup-zsh       # Write ~/.zshrc.local with DEV path and optional CONFLUENT_HOME
 just setup-git       # Write ~/.gitconfig.local with name and email
+just setup-ssh       # Full SSH setup: generate key + build ~/.ssh/config
+just setup-ssh-keys  # Generate an ed25519 SSH key and verify GitHub connectivity
+just setup-ssh-config # Interactively build or update ~/.ssh/config
 just macos           # Apply macOS system defaults (run explicitly, never automatic)
 ```
 
@@ -88,7 +91,7 @@ These cannot be automated and must be done by hand:
 
 ### SSH Config
 
-SSH config is not stored in this repo. Set up `~/.ssh/config` manually with your host aliases and keys.
+SSH config is not stored in this repo — it contains machine-specific and client-sensitive details. Run `just setup-ssh` to generate an SSH key (if needed), verify GitHub connectivity, and interactively build `~/.ssh/config` with your host aliases and identity files. Re-run `just setup-ssh-config` any time you need to add or clean up host blocks.
 
 ### Git Identity
 

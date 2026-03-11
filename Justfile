@@ -58,6 +58,17 @@ brew-check:
 # Run all machine-local setup steps (zsh + git). Run this on each new machine after `just install`
 setup: setup-zsh setup-git
 
+# Generate SSH keys and verify GitHub connectivity
+setup-ssh-keys:
+    bash install/configure_ssh.sh
+
+# Build or update ~/.ssh/config interactively
+setup-ssh-config:
+    bash install/configure_ssh_config.sh
+
+# Full SSH setup: key generation + config builder (run on new machines)
+setup-ssh: setup-ssh-keys setup-ssh-config
+
 # Set up machine-local shell environment (writes to ~/.zshrc.local)
 setup-zsh:
     #!/usr/bin/env bash

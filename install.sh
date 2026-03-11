@@ -2,6 +2,8 @@
 set -e
 
 DOTFILES="$HOME/dotfiles"
+echo "Ensuring we're in the $DOTFILES directory..."
+cd "$DOTFILES" 
 
 echo "==> Checking for Homebrew..."
 if ! command -v brew &>/dev/null; then
@@ -16,5 +18,14 @@ fi
 echo "==> Installing just..."
 brew install just
 
-echo "==> Running just install..."
-cd "$DOTFILES" && just install
+echo "==> Installing brew packages..."
+just brew-install
+
+echo "==> Linking dotfiles (stow)..."
+just link
+
+echo "==> Setting up SSH..."
+bash install/configure_ssh.sh
+
+echo "==> Installing language runtimes..."
+just install-runtimes

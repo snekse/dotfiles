@@ -8,7 +8,7 @@ if [[ -d "$NVM_DIR" ]]; then
 else
   echo "==> Installing NVM..."
   # Install latest NVM (check https://github.com/nvm-sh/nvm/releases for current version)
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | METHOD=script bash
 fi
 
 source "$NVM_DIR/nvm.sh"
