@@ -24,6 +24,10 @@ brew-install:
 # Install optional GUI apps and App Store apps (not run by default)
 install-apps:
     brew bundle --file=Brewfile.optional
+    @echo "Manually install the following apps from the App Store:"
+    @echo "    - Xcode"
+    @echo "    - Slack for Desktop"
+    @echo "    - Magnet"
 
 # Install all language runtimes
 install-runtimes: install-sdkman install-nvm install-rbenv

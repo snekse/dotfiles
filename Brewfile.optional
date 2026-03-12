@@ -12,8 +12,11 @@ cask "font-iosevka-slab"
 
 # Mac App Store (requires: mas installed and App Store sign-in)
 brew "mas"
-# mas "Xcode", id: 497799835
-mas "Slack for Desktop", id: 803453959
-mas "Magnet", id: 441258766
+
 cask "nikitabobko/tap/aerospace"
 cask "sublime-text"
+
+# For now, just install these manually
+# mas "Xcode", id: 497799835
+# mas "Slack for Desktop", id: 803453959
+# mas "Magnet", id: 441258766
