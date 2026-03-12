@@ -79,3 +79,10 @@ alias gb="./gradlew build"
 # These are build output dirs created by Maven/Gradle and can be safely deleted.
 # To actually delete them, pipe to xargs: deleteTargetDirs | xargs rm -rf
 alias deleteTargetDirs="find . -name target -type d"
+
+# =============================================================================
+# CLAUDE
+# =============================================================================
+
+alias cc="claude"
+alias cc!="claude!"
