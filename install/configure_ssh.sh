@@ -6,8 +6,14 @@ KEY_ED25519="$HOME/.ssh/id_ed25519"
 KEY_RSA="$HOME/.ssh/id_rsa"
 
 # ── 1. Check for an existing key ────────────────────────────────────────────
+KEY_REGISTERED=false
 if [[ -f "$KEY_ED25519" || -f "$KEY_RSA" ]]; then
   echo "==> SSH key found, skipping keygen."
+  read -rp "    Is this key already registered with GitHub? [Y/n] " already
+  already="${already:-Y}"
+  if [[ "$already" =~ ^[Yy]$ ]]; then
+    KEY_REGISTERED=true
+  fi
 else
   echo ""
   echo "==> No SSH key found."
@@ -42,7 +48,7 @@ elif [[ -f "${KEY_RSA}.pub" ]]; then
   PUB_KEY="${KEY_RSA}.pub"
 fi
 
-if [[ -n "$PUB_KEY" ]]; then
+if [[ -n "$PUB_KEY" ]] && [[ "$KEY_REGISTERED" == false ]]; then
   echo ""
   echo "==> Your public key:"
   echo ""
