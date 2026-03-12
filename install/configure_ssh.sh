@@ -48,6 +48,10 @@ if [[ -n "$PUB_KEY" ]]; then
   echo ""
   cat "$PUB_KEY"
   echo ""
+  if command -v pbcopy &>/dev/null; then
+    pbcopy < "$PUB_KEY"
+    echo "  (Copied to clipboard)"
+  fi
   echo "  Add it to GitHub: https://github.com/settings/ssh/new"
   echo ""
   read -rp "Press Enter once you have added the SSH key to GitHub..."

@@ -29,3 +29,6 @@ bash install/configure_ssh.sh
 
 echo "==> Installing language runtimes..."
 just install-runtimes
+
+# Finished
+echo "==> Installation complete!"
