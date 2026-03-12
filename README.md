@@ -4,8 +4,15 @@ macOS dotfiles managed with [GNU Stow](https://www.gnu.org/software/stow/), orch
 
 ## Quick Start
 
+> [!IMPORTANT]
+> **STEP 0**
+> Open Safari and download and log in to *1Password*
+> Open the app store. Search for `xcode` and make sure it's up to date
+
 ```bash
-git clone <repo-url> ~/dotfiles
+# Update the REPO_URL to your own fork
+REPO_URL="https://github.com/snekse/dotfiles.git"
+git clone $REPO_URL ~/dotfiles
 cd ~/dotfiles
 ./install.sh
 ```
