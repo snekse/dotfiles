@@ -29,6 +29,11 @@ install-apps:
     @echo "    - Slack for Desktop"
     @echo "    - Magnet"
 
+    @echo ""
+    @echo "Manually download and install:"
+    @echo "    - IntelliJ @ https://www.jetbrains.com/idea/download "
+    @echo "    - Discord @ https://discord.com/download " 
+
 # Install all language runtimes
 install-runtimes: install-sdkman install-nvm install-rbenv
 

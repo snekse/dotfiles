@@ -51,6 +51,9 @@ brew "pandoc"           # universal document converter (markdown → PDF, DOCX, 
 # Shell tooling
 brew "shellcheck"       # static analysis / linter for shell scripts
 
+# macOS utilities
+brew "dockutil"         # CLI for managing macOS Dock items (used by macos/defaults.sh)
+
 # Docker
 brew "lazydocker"       # terminal UI for Docker and Docker Compose
 

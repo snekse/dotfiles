@@ -77,6 +77,28 @@ defaults write com.apple.ActivityMonitor ShowCategory -int 0
 defaults write com.apple.ActivityMonitor IconType -int 5
 
 # ============================================================
+# Dock
+# ============================================================
+
+# Remove stock apps that clutter the default Dock
+# Wrapper suppresses exit code 1 when app is already absent
+dock_remove() { dockutil --remove "$1" --no-restart 2>/dev/null || true; }
+
+dock_remove "Phone"
+dock_remove "FaceTime"
+dock_remove "Photos"
+dock_remove "Maps"
+dock_remove "Mail"
+dock_remove "Messages"
+dock_remove "TV"
+dock_remove "Music"
+dock_remove "Keynote"
+dock_remove "Numbers"
+dock_remove "Pages"
+dock_remove "Games"
+dock_remove "iPhone Mirroring"
+
+# ============================================================
 # Apply changes
 # ============================================================
 
