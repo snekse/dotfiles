@@ -16,5 +16,4 @@ source "$NVM_SCRIPT"
 
 echo "==> Installing Node LTS..."
 nvm install --lts
-nvm use --lts
 nvm alias default lts/*
