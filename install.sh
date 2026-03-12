@@ -25,7 +25,7 @@ echo "==> Linking dotfiles (stow)..."
 just link
 
 echo "==> Setting up SSH..."
-bash install/configure_ssh.sh
+just setup-ssh-keys
 
 echo "==> Installing language runtimes..."
 just install-runtimes
