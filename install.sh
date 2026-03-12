@@ -16,7 +16,7 @@ if ! command -v brew &>/dev/null; then
 fi
 
 echo "==> Installing just..."
-brew install just
+brew install just --quiet
 
 echo "==> Installing brew packages..."
 just brew-install
