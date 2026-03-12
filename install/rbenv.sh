@@ -7,6 +7,12 @@ if ! command -v rbenv &>/dev/null; then
 fi
 
 echo "==> Installing Ruby (latest stable)..."
-RUBY_VERSION=$(rbenv install --list | grep -E '^\s+[0-9]+\.[0-9]+\.[0-9]+$' | tail -1 | tr -d ' ')
+RUBY_VERSION=$(rbenv install --list | awk '/^[0-9]+\.[0-9]+\.[0-9]+$/ { last = $1 } END { print last }')
+
+if [[ -z "$RUBY_VERSION" ]]; then
+  echo "==> Failed to determine latest Ruby version"
+  exit 1
+fi
+
 rbenv install --skip-existing "$RUBY_VERSION"
 rbenv global "$RUBY_VERSION"

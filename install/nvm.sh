@@ -2,8 +2,9 @@
 set -e
 
 NVM_DIR="$HOME/.nvm"
+NVM_SCRIPT="$NVM_DIR/nvm.sh"
 
-if [[ -d "$NVM_DIR" ]]; then
+if [[ -d "$NVM_DIR" ]] && [[ -s "$NVM_SCRIPT" ]]; then
   echo "==> NVM already installed, skipping installer"
 else
   echo "==> Installing NVM..."
@@ -11,7 +12,7 @@ else
   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | METHOD=script bash
 fi
 
-source "$NVM_DIR/nvm.sh"
+source "$NVM_SCRIPT"
 
 echo "==> Installing Node LTS..."
 nvm install --lts

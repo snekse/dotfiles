@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
-if [[ -d "$HOME/.sdkman" ]]; then
+SDKMAN_DIR="$HOME/.sdkman"
+SDKMAN_SCRIPT="$SDKMAN_DIR/bin/sdkman-init.sh"
+
+if [[ -d "$SDKMAN_DIR" ]] && [[ -s "$SDKMAN_SCRIPT" ]]; then
   echo "==> SDKMAN already installed, skipping installer"
 else
   echo "==> Installing SDKMAN..."
@@ -9,7 +12,7 @@ else
 fi
 
 # Source SDKMAN to use it immediately
-source "$HOME/.sdkman/bin/sdkman-init.sh"
+source "$SDKMAN_SCRIPT"
 
 # Install Amazon Corretto LTS (latest available)
 echo "==> Installing Amazon Corretto (Java LTS)..."
