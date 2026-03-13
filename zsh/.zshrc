@@ -18,3 +18,6 @@ done
 
 # Prompt
 eval "$(starship init zsh)"
+
+# Added by Antigravity
+export PATH="$PATH:$HOME/.antigravity/antigravity/bin"
