@@ -22,6 +22,44 @@ whatIsOnPort() {
 port() { lsof -i ":${1:?Usage: port <number>}"; }
 
 # =============================================================================
+# Git
+# =============================================================================
+
+# Clone a repo into a structured directory derived from the URL
+# Parses host/owner/repo from SSH or HTTPS URLs; github.com maps to $GITHUB_DIR
+# Optional second arg overrides the repo folder name
+# Usage: gclone git@github.com:snekse/dotfiles.git
+#        gclone git@github.com:nicknisi/dotfiles.git dotfiles-nick-nisi
+gclone() {
+  local url="${1:?Usage: gclone <repo-url> [alt-name]}"
+  local alt_name="$2"
+  local host owner repo
+
+  if [[ "$url" =~ ^git@([^:]+):([^/]+)/(.+)$ ]]; then
+    host="${match[1]}"
+    owner="${match[2]}"
+    repo="${match[3]%.git}"
+  elif [[ "$url" =~ ^https?://([^/]+)/([^/]+)/(.+)$ ]]; then
+    host="${match[1]}"
+    owner="${match[2]}"
+    repo="${match[3]%.git}"
+  else
+    echo "gclone: cannot parse URL: $url" >&2
+    return 1
+  fi
+
+  local base
+  case "$host" in
+    github.com) base="${GITHUB_DIR:-${DEV:-$HOME/dev}/github}" ;;
+    *)          base="${DEV:-$HOME/dev}/$host" ;;
+  esac
+
+  local dest="$base/$owner/${alt_name:-$repo}"
+  mkdir -p "$base/$owner"
+  git clone "$url" "$dest"
+}
+
+# =============================================================================
 # Local development
 # =============================================================================
 

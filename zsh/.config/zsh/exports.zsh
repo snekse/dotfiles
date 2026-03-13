@@ -8,6 +8,9 @@ export HISTFILESIZE=1000000
 export HISTFILE="$HOME/.zsh_history"
 export HISTIGNORE="clear:bg:fg:cd:cd -:exit:date:w:* --help"
 
+# Dev directories
+export GITHUB_DIR="${DEV:-$HOME/dev}/github"
+
 # Homebrew — auto-update at most once a week (default is 300s / 5 minutes)
 export HOMEBREW_AUTO_UPDATE_SECS=604800
 

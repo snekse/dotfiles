@@ -31,7 +31,7 @@ just install-apps    # Install optional GUI apps (casks, App Store)
 just update          # Upgrade brew packages
 just brew-check      # Check what brew bundle would change
 just setup           # Interactive new-machine setup (zsh + git local configs)
-just setup-zsh       # Write ~/.zshrc.local with DEV path and optional CONFLUENT_HOME
+just setup-zsh       # Write ~/.zshrc.local with DEV, GITHUB_DIR, MY_GITHUB_DIR, and optional CONFLUENT_HOME
 just setup-git       # Write ~/.gitconfig.local with name and email
 just setup-ssh       # Full SSH setup: generate key + build ~/.ssh/config
 just setup-ssh-keys  # Generate an ed25519 SSH key and verify GitHub connectivity
@@ -73,6 +73,12 @@ Custom functions are defined in `zsh/.config/zsh/` and auto-sourced by `.zshrc`.
 |---|---|
 | `brew-add [-o] [-S] [--cask\|--tap\|--formula] <pkg>` | Add a package to the Brewfile, install it, and sync the repo (pull → install → commit → push). Auto-detects formula vs cask. `-o` targets `Brewfile.optional`; `-S` skips git sync. |
 | `brew-remove [-S] <pkg>` | Uninstall a package and remove it from whichever Brewfile it lives in, then commit and push. Searches both Brewfiles, identifies type (formula/cask/tap/mas), and confirms before doing anything. `-S` skips git sync. |
+
+### Git (`functions.zsh`)
+
+| Function | Description |
+|---|---|
+| `gclone <repo-url> [alt-name]` | Clone a repo into a structured path derived from the URL (`$GITHUB_DIR/<owner>/<repo>`). Optional second arg overrides the folder name. |
 
 ### Filesystem & Network (`functions.zsh`)
 
