@@ -29,6 +29,15 @@ fi
 sdk default java "$JAVA_VERSION"
 
 # Install additional candidates as needed
-# sdk install gradle
-# sdk install maven
-# Uncomment or add versions based on your projects
+echo ""
+read -p "Install Gradle? (Y/n) " -r gradle_response
+gradle_response=${gradle_response:-Y}
+if [[ "$gradle_response" =~ ^[Yy]$ ]]; then
+  sdk install gradle
+fi
+
+read -p "Install Maven? (Y/n) " -r maven_response
+maven_response=${maven_response:-Y}
+if [[ "$maven_response" =~ ^[Yy]$ ]]; then
+  sdk install maven
+fi
