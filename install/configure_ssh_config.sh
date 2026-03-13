@@ -4,7 +4,6 @@
 # fine-grained control flow.
 
 SSH_CONFIG="$HOME/.ssh/config"
-SSH_CONFIG_BAK="$HOME/.ssh/config.bak"
 
 # ── Parsed state ──────────────────────────────────────────────────────────────
 global_section=""        # lines before the first Host block
@@ -213,6 +212,20 @@ check_conflicts() {
   new_texts=("${keep_texts[@]+"${keep_texts[@]}"}")
 }
 
+# ── Ensure required global settings are present ───────────────────────────────
+ensure_global_settings() {
+  local patched=false
+  for setting in "AddKeysToAgent yes" "UseKeychain yes"; do
+    local key="${setting%% *}"
+    if ! grep -qi "^[[:space:]]*${key}[[:space:]]" <<< "$global_section"; then
+      global_section+="${setting}"$'\n'
+      echo "  Patched missing global setting: ${setting}"
+      patched=true
+    fi
+  done
+  $patched || echo "  Global settings OK (AddKeysToAgent, UseKeychain already present)."
+}
+
 # ── Build merged config string ────────────────────────────────────────────────
 build_config() {
   local result=""
@@ -281,8 +294,9 @@ preview_and_confirm() {
   fi
 
   if [[ -f "$SSH_CONFIG" ]]; then
-    cp "$SSH_CONFIG" "$SSH_CONFIG_BAK"
-    echo "  Backed up existing config to $SSH_CONFIG_BAK"
+    local bak="${SSH_CONFIG}.bak.$(date +%Y%m%d_%H%M%S)"
+    cp "$SSH_CONFIG" "$bak"
+    echo "  Backed up existing config to $bak"
   fi
 
   mkdir -p "$(dirname "$SSH_CONFIG")"
@@ -301,6 +315,7 @@ main() {
     echo "    Found existing ~/.ssh/config"
     parse_config "$SSH_CONFIG"
     triage_commented_blocks
+    ensure_global_settings
   else
     echo "    No existing ~/.ssh/config — starting fresh."
   fi

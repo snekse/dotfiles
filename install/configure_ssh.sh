@@ -14,6 +14,15 @@ if [[ -f "$KEY_ED25519" || -f "$KEY_RSA" ]]; then
   if [[ "$already" =~ ^[Yy]$ ]]; then
     KEY_REGISTERED=true
   fi
+  # Ensure the key is loaded into the agent and persisted in macOS Keychain.
+  # This is idempotent: safe to re-run even if already present.
+  echo "==> Adding key to SSH agent and macOS Keychain..."
+  if [[ -f "$KEY_ED25519" ]]; then
+    ssh-add --apple-use-keychain "$KEY_ED25519"
+  elif [[ -f "$KEY_RSA" ]]; then
+    ssh-add --apple-use-keychain "$KEY_RSA"
+  fi
+  echo "    Key added to agent and Keychain."
 else
   echo ""
   echo "==> No SSH key found."
@@ -25,7 +34,7 @@ else
     mkdir -p "$HOME/.ssh"
     chmod 700 "$HOME/.ssh"
     ssh-keygen -t ed25519 -C "$email" -f "$KEY_ED25519"
-    ssh-add "$KEY_ED25519"
+    ssh-add --apple-use-keychain "$KEY_ED25519"
   else
     echo ""
     echo "  WARNING: No SSH key generated."
