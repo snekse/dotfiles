@@ -57,6 +57,9 @@ gclone() {
   local dest="$base/$owner/${alt_name:-$repo}"
   mkdir -p "$base/$owner"
   git clone "$url" "$dest"
+
+  read -rp "Would you like to go there now? [Y/n] " go
+  [[ "${go:-y}" =~ ^[Yy]$ ]] && cd "$dest"
 }
 
 # =============================================================================
