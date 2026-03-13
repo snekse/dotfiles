@@ -32,7 +32,12 @@ install-apps:
     @echo ""
     @echo "Manually download and install:"
     @echo "    - IntelliJ @ https://www.jetbrains.com/idea/download "
-    @echo "    - Discord @ https://discord.com/download " 
+    @echo "    - Discord @ https://discord.com/download "
+
+    @echo ""
+    @echo "Manually download and install Microsoft Office:"
+    @echo "    - Use main account"
+    @echo "    - @ https://account.microsoft.com/services "
 
 # Install all language runtimes
 install-runtimes: install-sdkman install-nvm install-rbenv
