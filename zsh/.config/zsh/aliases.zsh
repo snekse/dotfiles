@@ -70,6 +70,8 @@ alias hidefiles='defaults write com.apple.finder AppleShowAllFiles NO && killall
 # Run the project-local Gradle wrapper (not a globally installed gradle)
 # The wrapper script is checked into each project at ./gradlew
 alias gb="./gradlew build"
+alias gbuild="./gradlew build"
+alias gtest="./gradlew test"
 
 # =============================================================================
 # Maven / Gradle — build artifact cleanup
