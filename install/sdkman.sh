@@ -18,9 +18,13 @@ source "$SDKMAN_SCRIPT"
 echo "==> Installing Amazon Corretto (Java LTS)..."
 JAVA_VERSION=$(SDKMAN_COLOUR=false sdk list java 2>/dev/null \
   | grep -E '\bamzn\b' \
-  | grep 'LTS' \
+  | grep -E '\b(8|11|17|21|25)\.' \
   | head -1 \
   | awk '{print $NF}')
+if [[ -z "$JAVA_VERSION" ]]; then
+  echo "ERROR: Could not detect Amazon Corretto LTS version from SDKMAN. Aborting Java install." >&2
+  exit 1
+fi
 if sdk list java | grep -q "installed.*${JAVA_VERSION}"; then
   echo "==> Java $JAVA_VERSION already installed, skipping"
 else
