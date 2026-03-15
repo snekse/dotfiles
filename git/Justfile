@@ -89,9 +89,7 @@ setup-git-personal:
       2)
         bash install/configure_gpg.sh
         echo ""
-        echo "Your GPG keys:"
-        gpg --list-secret-keys --keyid-format=long
-        read -rp "Enter the Key ID from the 'sec' line above: " signing_key
+        read -rp "Enter the Key ID so we can put it in your gitconfig identity: " signing_key
         ;;
       *)
         signing_key=""
