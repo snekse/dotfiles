@@ -63,6 +63,49 @@ gclone() {
 }
 
 # =============================================================================
+# GPG
+# =============================================================================
+
+# Create a new GPG key for git commit signing
+# Usage: createGpgKey
+createGpgKey() {
+  bash "${DOTFILES_DIR:-$HOME/dotfiles}/install/configure_gpg.sh"
+}
+
+# Export a GPG public key in ASCII-armored format
+# Usage: exportGpgPublicKey <key-id>
+exportGpgPublicKey() {
+  local key_id="${1:?Usage: exportGpgPublicKey <key-id>}"
+  local output
+  output=$(gpg --armor --export "$key_id")
+
+  read -rp "Output to (c)lipboard or (d)isplay? [c/d, default: d] " dest
+  if [[ "${dest:-d}" =~ ^[Cc]$ ]]; then
+    echo "$output" | pbcopy
+    echo "Public key copied to clipboard."
+  else
+    echo "$output"
+  fi
+}
+
+# Export a GPG private key in ASCII-armored format
+# PRIVACY: call with a leading space to suppress shell history:  exportGpgPrivateKey <key-id>
+# Requires HIST_IGNORE_SPACE (already set in this dotfiles repo)
+exportGpgPrivateKey() {
+  local key_id="${1:?Usage: exportGpgPrivateKey <key-id>}"
+  local output
+  output=$(gpg --armor --export-secret-keys "$key_id")
+
+  read -rp "Output to (c)lipboard or (d)isplay? [c/d, default: d] " dest
+  if [[ "${dest:-d}" =~ ^[Cc]$ ]]; then
+    echo "$output" | pbcopy
+    echo "Private key copied to clipboard."
+  else
+    echo "$output"
+  fi
+}
+
+# =============================================================================
 # Local development
 # =============================================================================
 

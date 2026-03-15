@@ -35,6 +35,7 @@ just setup-zsh          # Write ~/.zshrc.local with DEV, GITHUB_DIR, MY_GITHUB_D
 just setup-git          # Write ~/.gitconfig.local (fallback identity for unmatched repos)
 just setup-git-personal # Write ~/.gitconfig-personal (identity for ~/dev/github/snekse/)
 just setup-git-work     # Write ~/.gitconfig-work (optional work identity)
+just setup-gpg          # Generate a new GPG key for commit signing
 just setup-ssh          # Full SSH setup: generate key + build ~/.ssh/config
 just setup-ssh-keys     # Generate an ed25519 SSH key and verify GitHub connectivity
 just setup-ssh-config   # Interactively build or update ~/.ssh/config
@@ -82,6 +83,14 @@ Custom functions are defined in `zsh/.config/zsh/` and auto-sourced by `.zshrc`.
 |---|---|
 | `gclone <repo-url> [alt-name]` | Clone a repo into a structured path derived from the URL (`$GITHUB_DIR/<owner>/<repo>`). Optional second arg overrides the folder name. |
 
+### GPG (`functions.zsh`)
+
+| Function | Description |
+|---|---|
+| `createGpgKey` | Generate a new GPG key interactively. Prompts for name, email, and passphrase; publishes to keyserver (optional); exports public and private keys (optional). Run multiple times to create additional keys. |
+| `exportGpgPublicKey <key-id>` | Export a GPG public key in ASCII-armored format. Prompts to copy to clipboard or print to terminal. |
+| `exportGpgPrivateKey <key-id>` | Export a GPG private key in ASCII-armored format. Prompts to copy to clipboard or print. Call with a leading space (` exportGpgPrivateKey`) to keep it out of shell history. |
+
 ### Filesystem & Network (`functions.zsh`)
 
 | Function | Description |
@@ -128,6 +137,20 @@ For multi-identity setups, the main `.gitconfig` uses `includeIf` to automatical
 This means any repo under `~/dev/github/snekse/` automatically gets the personal identity — no per-repo configuration needed. To add a work identity, copy `git/.gitconfig-work` to `~/.gitconfig-work`, fill in your details, and uncomment the matching `includeIf` block in `.gitconfig`.
 
 `useConfigOnly = true` is set globally, which means git will error rather than silently use a wrong identity if no matching config is found for a repo. Always ensure repos live under a configured `includeIf` path or that `~/.gitconfig.local` exists as a fallback.
+
+### GPG Signing Keys
+
+Generate a new GPG key by running `createGpgKey` (or `just setup-gpg`). The interactive script will:
+
+1. Collect your name and email (must match your GitHub-associated email)
+2. Generate a 4096-bit RSA key with a subkey
+3. Display the Key ID and optionally publish it to `keys.openpgp.org`
+4. Export your public key for adding to GitHub (`Settings > SSH and GPG keys > New GPG key`)
+5. Export your private key for GitHub Actions workflows (save as `GPG_SIGNING_KEY` repository secret) and the passphrase (save as `GPG_SIGNING_PASSWORD`)
+
+**⚠️ Important:** Your GPG passphrase **cannot be recovered** if lost. Save it immediately to your password manager.
+
+To create multiple keys, simply run `createGpgKey` multiple times. When running `just setup-git-personal` or `just setup-git-work`, you'll be prompted to either use an existing key, generate a new one, or skip GPG signing altogether.
 
 ### App Store
 

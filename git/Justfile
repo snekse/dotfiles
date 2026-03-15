@@ -33,6 +33,10 @@ setup-git:
     echo ""
     echo "Written to $local_file"
 
+# Generate a new GPG key for git commit signing
+setup-gpg:
+    bash install/configure_gpg.sh
+
 # Set up personal git identity (writes to ~/.gitconfig-personal)
 # Loaded for repos under ~/dev/github/snekse/ via includeIf in .gitconfig
 setup-git-personal:
@@ -61,7 +65,38 @@ setup-git-personal:
     read -rp "Git email [default: snekse@gmail.com]: " git_email
     git_email="${git_email:-snekse@gmail.com}"
 
-    read -rp "GPG signing key ID (leave blank to skip): " signing_key
+    # Show existing keys if any
+    existing_keys=$(gpg --list-secret-keys --keyid-format=long 2>/dev/null | grep sec || true)
+    if [[ -n "$existing_keys" ]]; then
+      echo ""
+      echo "Existing GPG secret keys:"
+      echo "$existing_keys"
+    fi
+
+    echo ""
+    echo "GPG signing key:"
+    echo "  1) Enter an existing key ID"
+    echo "  2) Generate a new GPG key now (runs setup-gpg)"
+    echo "  3) Skip GPG signing"
+    read -rp "Choice [1/2/3, default: 3]: " gpg_choice
+    gpg_choice="${gpg_choice:-3}"
+
+    signing_key=""
+    case "$gpg_choice" in
+      1)
+        read -rp "GPG signing key ID: " signing_key
+        ;;
+      2)
+        bash install/configure_gpg.sh
+        echo ""
+        echo "Your GPG keys:"
+        gpg --list-secret-keys --keyid-format=long
+        read -rp "Enter the Key ID from the 'sec' line above: " signing_key
+        ;;
+      *)
+        signing_key=""
+        ;;
+    esac
 
     {
       echo "# Personal git identity — not committed to repo"
@@ -107,7 +142,38 @@ setup-git-work:
     read -rp "Git email: " git_email
     [[ -z "$git_email" ]] && { echo "Email cannot be empty. Aborted."; exit 1; }
 
-    read -rp "GPG signing key ID (leave blank to skip): " signing_key
+    # Show existing keys if any
+    existing_keys=$(gpg --list-secret-keys --keyid-format=long 2>/dev/null | grep sec || true)
+    if [[ -n "$existing_keys" ]]; then
+      echo ""
+      echo "Existing GPG secret keys:"
+      echo "$existing_keys"
+    fi
+
+    echo ""
+    echo "GPG signing key:"
+    echo "  1) Enter an existing key ID"
+    echo "  2) Generate a new GPG key now (runs setup-gpg)"
+    echo "  3) Skip GPG signing"
+    read -rp "Choice [1/2/3, default: 3]: " gpg_choice
+    gpg_choice="${gpg_choice:-3}"
+
+    signing_key=""
+    case "$gpg_choice" in
+      1)
+        read -rp "GPG signing key ID: " signing_key
+        ;;
+      2)
+        bash install/configure_gpg.sh
+        echo ""
+        echo "Your GPG keys:"
+        gpg --list-secret-keys --keyid-format=long
+        read -rp "Enter the Key ID from the 'sec' line above: " signing_key
+        ;;
+      *)
+        signing_key=""
+        ;;
+    esac
 
     {
       echo "# Work git identity — not committed to repo"
