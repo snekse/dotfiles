@@ -7,6 +7,8 @@ export HISTSIZE=1000000
 export HISTFILESIZE=1000000
 export HISTFILE="$HOME/.zsh_history"
 export HISTIGNORE="clear:bg:fg:cd:cd -:exit:date:w:* --help"
+export HISTCONTROL=ignorespace
+setopt HIST_IGNORE_SPACE
 
 # Dev directories
 export GITHUB_DIR="${DEV:-$HOME/dev}/github"
