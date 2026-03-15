@@ -55,3 +55,6 @@ auth.json
 *.pem
 *.key
 *.pkcs12
+
+# IDE files
+.idea/
