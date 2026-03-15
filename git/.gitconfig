@@ -76,10 +76,12 @@
   cob = checkout -b
   cop = "!f() { git fetch && git co $1 && git pull; }; f"
   makeb = "!f() { git cob $1 && git branch --force $2 origin/$2; }; f"
+  stashAndBranch = "!f(){ git stash && git cop \"$1\" && git cob \"$2\" && git stash pop; }; f"
   findb = "!f(){ git branches | grep $1; }; f"
   st = status -sb
   echoStatus = "!f(){ pwd && git status -sb && echo; }; f"
   recent = for-each-ref --count=10 --sort=-committerdate refs/heads/ --format="%(refname:short)"
+  
 
   ########################################
   # Pull & Fetch commands
