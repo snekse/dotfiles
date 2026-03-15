@@ -30,12 +30,14 @@ just unlink          # Unstow all packages
 just install-apps    # Install optional GUI apps (casks, App Store)
 just update          # Upgrade brew packages
 just brew-check      # Check what brew bundle would change
-just setup           # Interactive new-machine setup (zsh + git local configs)
-just setup-zsh       # Write ~/.zshrc.local with DEV, GITHUB_DIR, MY_GITHUB_DIR, and optional CONFLUENT_HOME
-just setup-git       # Write ~/.gitconfig.local with name and email
-just setup-ssh       # Full SSH setup: generate key + build ~/.ssh/config
-just setup-ssh-keys  # Generate an ed25519 SSH key and verify GitHub connectivity
-just setup-ssh-config # Interactively build or update ~/.ssh/config
+just setup              # Interactive new-machine setup (zsh + git identities)
+just setup-zsh          # Write ~/.zshrc.local with DEV, GITHUB_DIR, MY_GITHUB_DIR, and optional CONFLUENT_HOME
+just setup-git          # Write ~/.gitconfig.local (fallback identity for unmatched repos)
+just setup-git-personal # Write ~/.gitconfig-personal (identity for ~/dev/github/snekse/)
+just setup-git-work     # Write ~/.gitconfig-work (optional work identity)
+just setup-ssh          # Full SSH setup: generate key + build ~/.ssh/config
+just setup-ssh-keys     # Generate an ed25519 SSH key and verify GitHub connectivity
+just setup-ssh-config   # Interactively build or update ~/.ssh/config
 just macos           # Apply macOS system defaults (run explicitly, never automatic)
 ```
 
@@ -108,7 +110,13 @@ SSH config is not stored in this repo — it contains machine-specific and clien
 
 ### Git Identity
 
-Run `just setup-git` to create `~/.gitconfig.local` with your machine-specific default identity (name and email). This file is never committed to the repo.
+Run `just setup` to create all three identity files:
+
+- `~/.gitconfig.local` — fallback identity for repos that don't match any `includeIf` path
+- `~/.gitconfig-personal` — loaded automatically for repos under `~/dev/github/snekse/`
+- `~/.gitconfig-work` — optional work identity (skippable during setup)
+
+None of these files are committed to the repo. The `git/` stow package contains reference templates for each.
 
 For multi-identity setups, the main `.gitconfig` uses `includeIf` to automatically load a different identity based on which directory a repo lives in:
 

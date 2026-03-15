@@ -6,3 +6,4 @@
 [user]
   name = Your Name
   email = you@personal.com
+  signingkey = YOUR_GPG_KEY_ID  # gpg --list-secret-keys --keyid-format LONG

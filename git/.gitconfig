@@ -172,7 +172,14 @@
   dev    = !git co develop
   devUp  = !git cop develop
 
+# Machine-specific fallback identity for repos outside any includeIf path.
+# Must come BEFORE the includeIf blocks so they can override it.
+# Not in repo — created by: just setup-git
+[include]
+  path = ~/.gitconfig.local
+
 # Multi-identity: loads a different [user] block based on which directory the repo lives in.
+# Must come AFTER [include] above so these take precedence over the fallback.
 # The path must end with a trailing slash.
 # All personal repos live under ~/dev/github/snekse/
 [includeIf "gitdir:~/dev/github/snekse/"]
@@ -181,8 +188,3 @@
 # Uncomment and set when working with a work/freelance org directory:
 # [includeIf "gitdir:~/dev/github/<org-name>/"]
 #   path = ~/.gitconfig-work
-
-# Machine-specific fallback: name, email, etc. for repos outside the above directories.
-# This file is NOT in the repo — created by running: just setup-git
-[include]
-  path = ~/.gitconfig.local
