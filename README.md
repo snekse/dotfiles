@@ -109,6 +109,22 @@ Custom functions are defined in `zsh/.config/zsh/` and auto-sourced by `.zshrc`.
 | `dcPull [file]` | Pull updated images for all services |
 | `dcDown [file]` | Stop and remove all containers, networks, and volumes |
 
+## Scripts
+
+Executable scripts live in `bin/` and are on `$PATH` via `$DOTFILES/bin` (see `zsh/.config/zsh/path.zsh`).
+
+| Script | Description |
+|---|---|
+| `claude-statusline` | Custom statusline for Claude Code's TUI. Reads JSON from stdin (provided by Claude Code) and outputs a formatted status bar showing the current model, session cost, lines changed, context window usage (with progress bar), and Anthropic API rate limit gauges. Configured via `statusLine` in `~/.claude/settings.json`. |
+
+**Feature flags** (set in `~/.zshrc.local` to customize):
+
+| Variable | Default | Effect |
+|---|---|---|
+| `CLAUDE_STATUSLINE_TOKENS` | `1` | Show token count alongside context bar percentage |
+| `CLAUDE_STATUSLINE_USAGE` | `1` | Show API usage limit bars (requires Claude Code OAuth via macOS Keychain) |
+| `CLAUDE_STATUSLINE_USAGE_TTL` | `120` | Seconds to cache API usage data before re-fetching |
+
 ## Manual Steps
 
 These cannot be automated and must be done by hand:
