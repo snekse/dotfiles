@@ -1,11 +1,13 @@
 # Core
-brew "git"
+brew "git"              # distributed version control system
 brew "stow"             # symlink manager for dotfiles
 brew "just"             # task runner for install/link/update commands
 brew "wget"             # download utility (not included with macOS)
 
-# Shell
+# Shell & Terminal
 brew "starship"         # cross-shell prompt, fast and customizable
+brew "zsh-syntax-highlighting" # syntax highlighting for zsh
+cask "ghostty"          # fast, native terminal emulator
 
 # Search / navigation
 brew "fzf"              # fuzzy finder for files, command history, etc.
@@ -19,6 +21,8 @@ brew "jq"               # command-line JSON processor
 brew "yq"               # command-line YAML processor
 brew "gh"               # GitHub CLI for PRs, issues, repos
 brew "tree"             # prints directory structure as a tree
+brew "glow"             # terminal markdown renderer
+brew "gnupg"            # GNU Privacy Guard for encryption and signing
 
 # Python — uv handles version management, virtual environments, and deps in one tool
 brew "uv"
@@ -30,6 +34,10 @@ brew "pnpm"
 brew "rbenv"
 brew "ruby-build"       # rbenv plugin to install Ruby versions
 
+# Java
+# springboot is managed via SDKMAN (see sdkman.zsh) — pivotal/tap formula is broken
+brew "maven"            # Java build tool
+
 # IDEs
 cask "antigravity"      # Google's Antigravity IDE
 
@@ -38,12 +46,9 @@ cask "alfred"           # app launcher and productivity tool
 
 # AI CLIs
 cask "claude"           # Anthropic's Claude Code CLI
+cask "claude-code"      # Anthropic's new Claude Code CLI
 brew "gemini-cli"       # Google's Gemini CLI
 cask "codex"            # OpenAI's Codex CLI
-
-# Java
-# springboot is managed via SDKMAN (see sdkman.zsh) — pivotal/tap formula is broken
-brew "maven"            # Java build tool
 
 # Document processing
 brew "pandoc"           # universal document converter (markdown → PDF, DOCX, etc.)
@@ -59,9 +64,4 @@ brew "lazydocker"       # terminal UI for Docker and Docker Compose
 
 # Git
 brew "git-lfs"          # Git Large File Storage — handles binary assets in repos
-brew "gitleaks"
-brew "zsh-syntax-highlighting"
-brew "glow"
-brew "gnupg"
-cask "claude-code"
-cask "ghostty"
+brew "gitleaks"         # secret scanner for git repositories
