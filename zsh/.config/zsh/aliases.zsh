@@ -20,6 +20,8 @@ alias ...='cd ../..'
 # Git
 # =============================================================================
 
+alias lg='lazygit'
+
 # Short status — shows M (modified), A (added), ? (untracked), etc.
 alias gs='git status -s'
 
