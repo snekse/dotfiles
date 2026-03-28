@@ -1,0 +1,19 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "claude-statusline"
+  },
+  "enabledPlugins": {
+    "ideation@nicknisi": true
+  },
+  "extraKnownMarketplaces": {
+    "nicknisi": {
+      "source": {
+        "source": "github",
+        "repo": "nicknisi/claude-plugins"
+      }
+    }
+  },
+  "effortLevel": "high",
+  "model": "opus"
+}

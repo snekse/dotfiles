@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+# Migrate ~/.claude/settings.json into the dotfiles home/ package.
+# Usage: bin/migrate-claude [-n|--dry-run]
+
+set -Eeuo pipefail
+
+DOTFILES="${DOTFILES:-$HOME/dotfiles}"
+SRC="$HOME/.claude/settings.json"
+DEST="$DOTFILES/home/.claude/settings.json"
+
+DRY_RUN=false
+if [[ "${1:-}" == "-n" || "${1:-}" == "--dry-run" ]]; then
+  DRY_RUN=true
+  printf 'DRY RUN — no changes will be made\n\n'
+fi
+
+run() {
+  if [ "$DRY_RUN" = true ]; then
+    printf '[dry-run] %s\n' "$*"
+  else
+    "$@"
+  fi
+}
+
+# Already a symlink — nothing to do
+if [ -L "$SRC" ]; then
+  printf '~/.claude/settings.json is already a symlink. Nothing to do.\n'
+  exit 0
+fi
+
+# Source doesn't exist
+if [ ! -f "$SRC" ]; then
+  printf '~/.claude/settings.json does not exist.\n'
+  if [ -f "$DEST" ]; then
+    printf 'Dotfiles copy found — stowing...\n'
+    run just -f "$DOTFILES/Justfile" link
+  else
+    printf 'Nothing to migrate.\n'
+  fi
+  exit 0
+fi
+
+# Create destination directory if needed
+run mkdir -p "$(dirname "$DEST")"
+
+# Sync — live wins if both exist and differ
+if [ -f "$DEST" ]; then
+  if ! diff -q "$SRC" "$DEST" &>/dev/null; then
+    printf 'settings.json differs — live version wins, updating dotfiles copy...\n'
+    run cp "$SRC" "$DEST"
+  else
+    printf 'settings.json is identical in live and dotfiles.\n'
+  fi
+else
+  printf 'Copying ~/.claude/settings.json into dotfiles...\n'
+  run cp "$SRC" "$DEST"
+fi
+
+# Remove the original real file so stow can create the symlink
+printf 'Removing original ~/.claude/settings.json...\n'
+run rm "$SRC"
+
+# Stow
+printf 'Linking home/ package...\n'
+run just -f "$DOTFILES/Justfile" link
+
+if [ "$DRY_RUN" = false ]; then
+  printf '\nDone. ~/.claude/settings.json is now managed by dotfiles.\n'
+  ls -la "$HOME/.claude/settings.json"
+fi

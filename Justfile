@@ -9,15 +9,15 @@ install: brew-install link install-runtimes
 
 # Stow all packages
 link:
-    stow zsh git starship
+    stow zsh git starship home
 
 # Restow all packages (use to apply structural changes without conflicts)
 relink:
-    stow --restow zsh git starship
+    stow --restow zsh git starship home
 
 # Unstow all packages
 unlink:
-    stow -D zsh git starship
+    stow -D zsh git starship home
 
 # Install core CLI tools
 brew-install:
@@ -84,6 +84,10 @@ setup-ssh-config:
 
 # Full SSH setup: key generation + config builder (run on new machines)
 setup-ssh: setup-ssh-keys setup-ssh-config
+
+# Migrate ~/.claude/settings.json into dotfiles and stow (run once per machine, -n for dry-run)
+migrate-claude *args:
+    bin/migrate-claude {{args}}
 
 # Set up machine-local shell environment (writes to ~/.zshrc.local)
 setup-zsh:

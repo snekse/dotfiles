@@ -8,7 +8,7 @@ A macOS dotfiles repo using **GNU Stow** for symlink management, **just** for ta
 
 ## Architecture
 
-- **Stow packages**: Each top-level directory (`zsh/`, `git/`, `starship/`) is a Stow package. Files inside mirror their target location relative to `$HOME`.
+- **Stow packages**: Each top-level directory (`zsh/`, `git/`, `starship/`, `home/`) is a Stow package. Files inside mirror their target location relative to `$HOME`.
 - **Bootstrap flow**: `install.sh` installs Homebrew + `just`, then runs `just install` which stows packages, runs `brew bundle`, and installs language runtimes.
 - **Two Brewfiles**: `Brewfile` (core CLI tools + casks, always installed) and `Brewfile.optional` (GUI apps/fonts/MAS apps, only via `just install-apps`).
 - **Git multi-identity**: Uses `includeIf` in gitconfig for per-directory identity switching. Fallback identity in `~/.gitconfig.local` (not in repo, created by `just setup-git`).
@@ -26,7 +26,7 @@ A macOS dotfiles repo using **GNU Stow** for symlink management, **just** for ta
 ```bash
 just --list              # Show all available targets
 just install             # Full install: stow packages + brew bundle + runtimes
-just link                # Stow all packages (zsh git starship)
+just link                # Stow all packages (zsh git starship home)
 just unlink              # Unstow all packages
 just brew-install        # Install core CLI tools only
 just install-apps        # Install optional GUI apps (explicit only)
