@@ -28,6 +28,7 @@ brew "gnupg"            # GNU Privacy Guard for encryption and signing
 brew "uv"
 
 # Node — pnpm is the primary package manager (faster installs, shared content-addressable store)
+brew "oven-sh/bun/bun"  # Bun is a fast JavaScript runtime and package manager
 brew "pnpm"
 
 # Ruby — version manager similar to SDKMAN for Java
