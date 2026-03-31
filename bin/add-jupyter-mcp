@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Add Jupyter MCP server config to the current project's .claude/settings.json.
+# Enables Claude agents to create, edit, and execute notebook cells via a running Jupyter server.
+#
+# Usage: add-jupyter-mcp [--url URL] [--token TOKEN]
+#   --url    Jupyter server base URL (default: http://localhost:8888)
+#   --token  Jupyter server token    (default: empty — matches --NotebookApp.token='')
+
+set -Eeuo pipefail
+
+JUPYTER_URL="http://localhost:8888"
+JUPYTER_TOKEN=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --url)   JUPYTER_URL="$2"; shift 2 ;;
+    --token) JUPYTER_TOKEN="$2"; shift 2 ;;
+    *) printf 'Unknown argument: %s\n' "$1" >&2; exit 1 ;;
+  esac
+done
+
+SETTINGS_DIR=".claude"
+SETTINGS_FILE="$SETTINGS_DIR/settings.json"
+
+mkdir -p "$SETTINGS_DIR"
+
+mcp_block=$(jq -n --arg url "$JUPYTER_URL" --arg token "$JUPYTER_TOKEN" '{
+  "command": "uvx",
+  "args": ["jupyter-mcp-server"],
+  "env": {
+    "JUPYTER_BASE_URL": $url,
+    "JUPYTER_TOKEN": $token
+  }
+}')
+
+if [ -f "$SETTINGS_FILE" ]; then
+  updated=$(jq --argjson mcp "$mcp_block" '.mcpServers.jupyter = $mcp' "$SETTINGS_FILE")
+  printf '%s\n' "$updated" > "$SETTINGS_FILE"
+else
+  jq -n --argjson mcp "$mcp_block" '{"mcpServers": {"jupyter": $mcp}}' > "$SETTINGS_FILE"
+fi
+
+printf 'Jupyter MCP server added to %s\n' "$SETTINGS_FILE"
+printf '  URL:   %s\n' "$JUPYTER_URL"
+printf '  Token: %s\n' "${JUPYTER_TOKEN:-<none>}"
+printf '\nStart Jupyter before using Claude:\n'
+printf '  jupyter lab --no-browser --NotebookApp.token='\'\''\n'

@@ -54,6 +54,26 @@ After `just install`, run on each new machine:
 - When adding, removing, or altering a shell function — especially environment-management functions like `brew-add` — update the **Shell Functions** section in `README.md` so users can discover available functions without reading source code.
 - Significant functions (those that manage packages, git, runtimes, or machine config) must always be documented in the README.
 
+## Dotfiles Scope
+
+This is a **machine configuration repo**, not a project repo. Before implementing any request, evaluate whether the change belongs here:
+
+**Belongs in dotfiles:**
+- Global CLI tools (Brewfile)
+- Shell config, aliases, env vars (zsh/ package)
+- Machine-level configs symlinked into `$HOME` (home/ package)
+- Reusable per-project setup scripts (`bin/` — stowed to `~/bin/`, on PATH)
+
+**Does NOT belong in dotfiles:**
+- Project-specific tooling or Justfile targets
+- MCP servers or tool configs that apply only to certain project types
+- Framework/language tooling that isn't universally needed
+
+**When a request seems like an odd fit:**
+1. Do not implement it silently — push back and share the concern
+2. Use `AskUserQuestion` to collaborate on alternatives
+3. Common alternative: a `bin/` script that sets up the pattern in any project that needs it (run once per project, not once per machine)
+
 ## Key Constraints
 
 - SSH config is **not committed** to the repo — documented as a manual post-install step
