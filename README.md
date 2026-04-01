@@ -39,7 +39,7 @@ just setup-gpg          # Generate a new GPG key for commit signing
 just setup-ssh          # Full SSH setup: generate key + build ~/.ssh/config
 just setup-ssh-keys     # Generate an ed25519 SSH key and verify GitHub connectivity
 just setup-ssh-config   # Interactively build or update ~/.ssh/config
-just migrate-claude     # Migrate ~/.claude/settings.json into dotfiles (run once per machine, use --dry-run to preview)
+<!-- just migrate-claude     # Migrate ~/.claude/settings.json into dotfiles (run once per machine, use --dry-run to preview) -->
 just macos           # Apply macOS system defaults (run explicitly, never automatic)
 ```
 
@@ -118,7 +118,7 @@ Executable scripts live in `bin/` and are on `$PATH` via `$DOTFILES/bin` (see `z
 
 | Script | Description |
 |---|---|
-| `migrate-claude` | One-time migration script that copies `~/.claude/settings.json` into the `home/` stow package, removes the original, and re-stows. Supports `--dry-run` (`-n`) to preview changes without modifying anything. |
+<!-- | `migrate-claude` | One-time migration script that copies `~/.claude/settings.json` into the `home/` stow package, removes the original, and re-stows. Supports `--dry-run` (`-n`) to preview changes without modifying anything. | -->
 | `claude-statusline` | Custom statusline for Claude Code's TUI. Reads JSON from stdin (provided by Claude Code) and outputs a formatted status bar showing the current model, session cost, lines changed, context window usage (with progress bar), and Anthropic API rate limit gauges. Configured via `statusLine` in `~/.claude/settings.json`. |
 
 **Feature flags** (set in `~/.zshrc.local` to customize):

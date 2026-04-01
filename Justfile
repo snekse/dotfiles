@@ -85,9 +85,9 @@ setup-ssh-config:
 # Full SSH setup: key generation + config builder (run on new machines)
 setup-ssh: setup-ssh-keys setup-ssh-config
 
-# Migrate ~/.claude/settings.json into dotfiles and stow (run once per machine, -n for dry-run)
-migrate-claude *args:
-    bin/migrate-claude {{args}}
+# # Migrate ~/.claude/settings.json into dotfiles and stow (run once per machine, -n for dry-run)
+# migrate-claude *args:
+#     bin/migrate-claude {{args}}
 
 # Set up machine-local shell environment (writes to ~/.zshrc.local)
 setup-zsh:

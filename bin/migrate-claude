@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # Migrate ~/.claude/settings.json into the dotfiles home/ package.
 # Usage: bin/migrate-claude [-n|--dry-run]
+#
+# NOTE: ~/.claude/settings.json is no longer tracked in dotfiles.
+# This script is a no-op until a new strategy is implemented.
+
+echo "migrate-claude: ~/.claude/settings.json is no longer managed by dotfiles. Nothing to do."
+exit 0
 
 set -Eeuo pipefail
 
