@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# Global pre-commit hook: validate any staged skills.md files.
+#
+# Checks:
+#   1. Total line count must be < 500
+#   2. Front matter `description` field must be < 1024 characters
+
+MAX_LINES=500
+MAX_DESC_CHARS=1024
+
+errors=()
+
+staged_skills_files=$(git diff --cached --name-only --diff-filter=ACM | grep -i 'skills\.md$')
+
+for file in $staged_skills_files; do
+  # Check total line count
+  line_count=$(git show ":$file" | wc -l | tr -d ' ')
+  if [ "$line_count" -ge "$MAX_LINES" ]; then
+    errors+=("$file: $line_count lines (max $MAX_LINES)")
+  fi
+
+  # Extract front matter description and check character count
+  content=$(git show ":$file")
+  if echo "$content" | grep -q '^---'; then
+    # Extract the description value from YAML front matter
+    desc=$(echo "$content" | awk '
+      /^---/ { if (fm_start) { exit } else { fm_start=1; next } }
+      fm_start && /^description:/ {
+        sub(/^description:[[:space:]]*/, "")
+        # Strip surrounding quotes if present
+        gsub(/^["'"'"']|["'"'"']$/, "")
+        print
+        exit
+      }
+    ')
+    if [ -n "$desc" ]; then
+      desc_len=${#desc}
+      if [ "$desc_len" -gt "$MAX_DESC_CHARS" ]; then
+        errors+=("$file: front matter 'description' is $desc_len chars (max $MAX_DESC_CHARS)")
+      fi
+    fi
+  fi
+done
+
+if [ ${#errors[@]} -gt 0 ]; then
+  echo "skills.md validation failed:" >&2
+  for err in "${errors[@]}"; do
+    echo "  - $err" >&2
+  done
+  exit 1
+fi
+
+exit 0
