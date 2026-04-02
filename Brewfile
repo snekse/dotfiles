@@ -40,7 +40,8 @@ brew "ruby-build"       # rbenv plugin to install Ruby versions
 brew "maven"            # Java build tool
 
 # IDEs
-cask "antigravity"      # Google's Antigravity IDE
+cask "jetbrains-toolbox"  # Manage all JetBrains IDEs
+cask "antigravity"        # Google's Antigravity IDE
 
 # Productivity
 cask "alfred"           # app launcher and productivity tool
