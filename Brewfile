@@ -47,8 +47,9 @@ cask "antigravity"        # Google's Antigravity IDE
 cask "alfred"           # app launcher and productivity tool
 
 # AI CLIs
-cask "claude"           # Anthropic's Claude Code CLI
-cask "claude-code"      # Anthropic's new Claude Code CLI
+# DO NOT INSTALL CLAUDE via HOMEBREW - install via: `curl -fsSL https://claude.ai/install.sh | bash`
+# cask "claude"           # Anthropic's Claude Code CLI
+# cask "claude-code"      # Anthropic's new Claude Code CLI
 brew "gemini-cli"       # Google's Gemini CLI
 cask "codex"            # OpenAI's Codex CLI
 

@@ -21,3 +21,18 @@ eval "$(starship init zsh)"
 
 # Added by Antigravity
 export PATH="$PATH:$HOME/.antigravity/antigravity/bin"
+
+# pnpm
+export PNPM_HOME="/Users/derek/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/derek/.lmstudio/bin"
+# End of LM Studio CLI section
+
+# Added by Claude Code CLI
+export PATH="$HOME/.local/bin:$PATH"
