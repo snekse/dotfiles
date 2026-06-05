@@ -36,3 +36,6 @@ export PATH="$PATH:/Users/derek/.lmstudio/bin"
 
 # Added by Claude Code CLI
 export PATH="$HOME/.local/bin:$PATH"
+
+# Added by Antigravity IDE
+export PATH="$PATH:$HOME/.antigravity-ide/antigravity-ide/bin"
