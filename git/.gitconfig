@@ -2,6 +2,7 @@
   excludesfile = ~/.gitignore
   whitespace = fix
   autocrlf = input
+  hooksPath = ~/.config/git/hooks
 
 [color]
   ui = auto
